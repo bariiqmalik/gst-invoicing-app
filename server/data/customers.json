@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Bariq Malik",
+    "companyName": "collage",
+    "gstin": "",
+    "isB2B": false,
+    "email": "bariqmalik04@outlook.com",
+    "phone": "07780854723",
+    "billingAddress": {
+      "street": "NC-2",
+      "city": "Kharar",
+      "state": "Punjab",
+      "stateCode": "03",
+      "pincode": "140301"
+    },
+    "shippingAddress": {},
+    "notes": "",
+    "id": "id_muip254wsb950",
+    "createdAt": "2026-09-26T17:59:21.728Z",
+    "updatedAt": "2026-09-26T17:59:21.728Z"
+  },
+  {
+    "name": "Siddharth Rao",
+    "companyName": "Freelance Design Client",
+    "gstin": "",
+    "isB2B": false,
+    "email": "siddharth.rao@gmail.com",
+    "phone": "+91 97400 33211",
+    "billingAddress": {
+      "street": "12th Main, Indiranagar",
+      "city": "Bengaluru",
+      "state": "Karnataka",
+      "stateCode": "29",
+      "pincode": "560038"
+    },
+    "notes": "Individual freelance contract.",
+    "id": "id_muimv3bb2t2rx",
+    "createdAt": "2026-09-26T16:57:53.543Z",
+    "updatedAt": "2026-09-26T16:57:53.543Z"
+  },
+  {
+    "name": "Vikram Mehta",
+    "companyName": "Apex Healthtech Pvt Ltd",
+    "gstin": "27AAACA9876C1ZQ",
+    "isB2B": true,
+    "email": "finance@apexhealth.in",
+    "phone": "+91 98200 99887",
+    "billingAddress": {
+      "street": "B Wing, Godrej One, Vikhroli East",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "stateCode": "27",
+      "pincode": "400079"
+    },
+    "notes": "Healthcare technology client based in Mumbai.",
+    "id": "id_muimv3ba53hsw",
+    "createdAt": "2026-09-26T16:57:53.542Z",
+    "updatedAt": "2026-09-26T16:57:53.542Z"
+  },
+  {
+    "name": "Aditya Oberoi",
+    "companyName": "Zephyr Creative Agency",
+    "gstin": "07AAACZ1122D1Z4",
+    "isB2B": true,
+    "email": "billing@zephyrstudio.in",
+    "phone": "+91 99100 44552",
+    "billingAddress": {
+      "street": "Plot 14, Okhla Phase III",
+      "city": "New Delhi",
+      "state": "Delhi",
+      "stateCode": "07",
+      "pincode": "110020"
+    },
+    "notes": "Monthly retainer for branding and visual design.",
+    "id": "id_muimv3b8gbmyo",
+    "createdAt": "2026-09-26T16:57:53.540Z",
+    "updatedAt": "2026-09-26T16:57:53.540Z"
+  },
+  {
+    "name": "Priya Sundaram",
+    "companyName": "TechVeda Solutions LLP",
+    "gstin": "29AABCT1334M1ZV",
+    "isB2B": true,
+    "email": "accounts@techveda.io",
+    "phone": "+91 98450 88219",
+    "billingAddress": {
+      "street": "7th Cross, Koramangala 4th Block",
+      "city": "Bengaluru",
+      "state": "Karnataka",
+      "stateCode": "29",
+      "pincode": "560034"
+    },
+    "notes": "Key enterprise client. NET 15 payment terms.",
+    "id": "id_muimv3b5p15f1",
+    "createdAt": "2026-09-26T16:57:53.538Z",
+    "updatedAt": "2026-09-26T16:57:53.538Z"
+  }
+]

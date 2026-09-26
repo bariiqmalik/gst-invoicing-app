@@ -1,0 +1,54 @@
+[
+  {
+    "name": "High-Performance Edge Gateway Unit",
+    "description": "Industrial grade IoT edge computing hardware controller",
+    "type": "GOODS",
+    "hsnSacCode": "84715000",
+    "unitPrice": 32000,
+    "unit": "PCS",
+    "defaultGstRate": 18,
+    "isActive": true,
+    "id": "id_muimv3bhtcilp",
+    "createdAt": "2026-09-26T16:57:53.549Z",
+    "updatedAt": "2026-09-26T16:57:53.549Z"
+  },
+  {
+    "name": "Technical Consulting & Code Audit",
+    "description": "Security, performance optimization, and architectural review",
+    "type": "SERVICES",
+    "hsnSacCode": "998313",
+    "unitPrice": 3500,
+    "unit": "HRS",
+    "defaultGstRate": 18,
+    "isActive": true,
+    "id": "id_muimv3bf5ain0",
+    "createdAt": "2026-09-26T16:57:53.547Z",
+    "updatedAt": "2026-09-26T16:57:53.547Z"
+  },
+  {
+    "name": "UI/UX Design & Brand System",
+    "description": "End-to-end design tokens, Figma prototypes, design sprints",
+    "type": "SERVICES",
+    "hsnSacCode": "998311",
+    "unitPrice": 45000,
+    "unit": "NOS",
+    "defaultGstRate": 18,
+    "isActive": true,
+    "id": "id_muimv3bd9o73w",
+    "createdAt": "2026-09-26T16:57:53.545Z",
+    "updatedAt": "2026-09-26T16:57:53.545Z"
+  },
+  {
+    "name": "Full-Stack Web & API Architecture",
+    "description": "Custom React & Node.js scalable web application development",
+    "type": "SERVICES",
+    "hsnSacCode": "998314",
+    "unitPrice": 85000,
+    "unit": "NOS",
+    "defaultGstRate": 18,
+    "isActive": true,
+    "id": "id_muimv3bc0cjrc",
+    "createdAt": "2026-09-26T16:57:53.544Z",
+    "updatedAt": "2026-09-26T16:57:53.544Z"
+  }
+]
