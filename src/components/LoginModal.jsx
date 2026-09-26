@@ -154,16 +154,45 @@ export default function LoginModal({
     }
   };
 
+  // Direct 1-Click Demo Login
+  const handleDirectDemoLogin = async () => {
+    setActiveTab('login');
+    setLoginEmail('owner@vanistudios.in');
+    setLoginPassword('Admin@12345');
+    setError('');
+    setIsLoading(true);
+    try {
+      await onLogin({ email: 'owner@vanistudios.in', password: 'Admin@12345' });
+    } catch (err) {
+      setError(err.message || 'Demo login failed. Please verify server connection.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Handle Login
   const handleLoginSubmit = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     setError('');
+
+    const email = loginEmail.trim();
+    const pwd = loginPassword;
+
+    if (!email) {
+      setError('Please enter your business owner email.');
+      return;
+    }
+    if (!pwd) {
+      setError('Please enter your password. For demo access, click "Auto-fill" or "Instant Demo Unlock" below.');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await onLogin({ email: loginEmail.trim(), password: loginPassword });
+      await onLogin({ email, password: pwd });
     } catch (err) {
-      setError(err.message || 'Invalid email or password. Please try again.');
+      setError(err.message || 'Invalid email or password. Please check your credentials or click "Auto-fill" below.');
     } finally {
       setIsLoading(false);
     }
@@ -731,6 +760,7 @@ export default function LoginModal({
                         placeholder="••••••••"
                         value={loginPassword}
                         onChange={(e) => setLoginPassword(e.target.value)}
+                        autoComplete="current-password"
                         required
                         style={{ paddingLeft: '36px', paddingRight: '36px' }}
                       />
@@ -795,27 +825,47 @@ export default function LoginModal({
                   fontSize: '12px',
                   color: 'var(--accent-dark)'
                 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                     <span style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <ShieldCheck size={14} color="var(--accent-dark)" />
                       Demo Owner Workspace
                     </span>
-                    <button
-                      id="autofill-demo-btn"
-                      type="button"
-                      className="btn btn-sm"
-                      onClick={handleFillDemo}
-                      style={{
-                        background: 'var(--cards)',
-                        color: 'var(--accent-dark)',
-                        border: '1px solid var(--warning-border)',
-                        padding: '3px 8px',
-                        fontSize: '11px',
-                        fontWeight: 700
-                      }}
-                    >
-                      Auto-fill
-                    </button>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <button
+                        id="autofill-demo-btn"
+                        type="button"
+                        className="btn btn-sm"
+                        onClick={handleFillDemo}
+                        style={{
+                          background: 'var(--cards)',
+                          color: 'var(--accent-dark)',
+                          border: '1px solid var(--warning-border)',
+                          padding: '3px 8px',
+                          fontSize: '11px',
+                          fontWeight: 700
+                        }}
+                      >
+                        Auto-fill
+                      </button>
+                      <button
+                        id="instant-demo-unlock-btn"
+                        type="button"
+                        className="btn btn-sm"
+                        disabled={isLoading}
+                        onClick={handleDirectDemoLogin}
+                        style={{
+                          background: 'var(--accent)',
+                          color: '#FFFFFF',
+                          border: 'none',
+                          padding: '3px 9px',
+                          fontSize: '11px',
+                          fontWeight: 700,
+                          cursor: 'pointer'
+                        }}
+                      >
+                        1-Click Unlock →
+                      </button>
+                    </div>
                   </div>
                   <div>Email: <strong style={{ fontFamily: 'monospace' }}>owner@vanistudios.in</strong></div>
                   <div>Password: <strong style={{ fontFamily: 'monospace' }}>Admin@12345</strong></div>

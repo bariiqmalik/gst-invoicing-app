@@ -138,9 +138,12 @@ export default function App() {
         setCurrentUser(res.user);
         await loadWorkspaceData();
         showToast(`Welcome back, ${res.user?.name || 'Owner'}!`, 'success');
+        return res;
       }
+      throw new Error(res?.message || 'Login failed. Please check your credentials.');
     } catch (err) {
       showToast(err.message || 'Login failed. Please check your credentials.', 'error');
+      throw err;
     }
   };
 
@@ -152,9 +155,12 @@ export default function App() {
         setCurrentUser(res.user);
         await loadWorkspaceData();
         showToast('Business workspace registered successfully!', 'success');
+        return res;
       }
+      throw new Error(res?.message || 'Registration failed.');
     } catch (err) {
       showToast(err.message || 'Registration failed.', 'error');
+      throw err;
     }
   };
 
@@ -167,9 +173,12 @@ export default function App() {
         await loadWorkspaceData();
         const providerName = payload.provider?.toLowerCase() === 'google' ? 'Google' : 'Apple';
         showToast(`Authenticated securely via ${providerName} SSO!`, 'success');
+        return res;
       }
+      throw new Error(res?.message || 'Social authentication encountered an error.');
     } catch (err) {
       showToast(err.message || 'Social authentication encountered an error.', 'error');
+      throw err;
     }
   };
 
@@ -181,9 +190,12 @@ export default function App() {
         setCurrentUser(res.user);
         await loadWorkspaceData();
         showToast('Authenticated via Biometric Passkey / Touch ID!', 'success');
+        return res;
       }
+      throw new Error(res?.message || 'Passkey verification failed.');
     } catch (err) {
       showToast(err.message || 'Passkey verification failed.', 'error');
+      throw err;
     }
   };
 
@@ -332,17 +344,89 @@ export default function App() {
     );
   }
 
+  // Floating Notification Toasts Renderer
+  const renderToasts = () => {
+    if (toasts.length === 0) return null;
+    return (
+      <div style={{
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        zIndex: 9999,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '10px',
+        maxWidth: '400px',
+        width: 'calc(100% - 40px)',
+        pointerEvents: 'none'
+      }}>
+        {toasts.map((t) => {
+          const isSuccess = t.type === 'success';
+          const isError = t.type === 'error';
+          const borderColor = isSuccess ? 'var(--secondary)' : isError ? 'var(--danger)' : 'var(--primary)';
+          return (
+            <div
+              key={t.id}
+              style={{
+                pointerEvents: 'auto',
+                background: 'var(--cards)',
+                border: '1px solid var(--border)',
+                borderLeft: `4px solid ${borderColor}`,
+                borderRadius: 'var(--radius-md)',
+                padding: '12px 14px',
+                boxShadow: 'var(--shadow-lg)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '10px',
+                animation: 'fadeIn 0.2s ease-out'
+              }}
+            >
+              {isSuccess && <CheckCircle size={18} style={{ color: 'var(--secondary)', flexShrink: 0 }} />}
+              {isError && <AlertCircle size={18} style={{ color: 'var(--danger)', flexShrink: 0 }} />}
+              {!isSuccess && !isError && <Info size={18} style={{ color: 'var(--primary)', flexShrink: 0 }} />}
+              
+              <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text)', flex: 1, lineHeight: 1.4 }}>
+                {t.message}
+              </span>
+
+              <button
+                type="button"
+                onClick={() => removeToast(t.id)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: 'var(--muted-text)',
+                  padding: '4px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  borderRadius: '4px'
+                }}
+                aria-label="Dismiss notification"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   // If user is not authenticated, show single-business owner login modal
   if (!currentUser) {
     return (
-      <LoginModal 
-        onLogin={handleLogin} 
-        onRegister={handleRegister} 
-        onSocialLogin={handleSocialLogin}
-        onPasskeyLogin={handlePasskeyLogin}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-      />
+      <>
+        <LoginModal 
+          onLogin={handleLogin} 
+          onRegister={handleRegister} 
+          onSocialLogin={handleSocialLogin}
+          onPasskeyLogin={handlePasskeyLogin}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+        />
+        {renderToasts()}
+      </>
     );
   }
 
@@ -485,70 +569,7 @@ export default function App() {
       />
 
       {/* Floating Notification Toasts */}
-      {toasts.length > 0 && (
-        <div style={{
-          position: 'fixed',
-          top: '20px',
-          right: '20px',
-          zIndex: 9999,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px',
-          maxWidth: '400px',
-          width: 'calc(100% - 40px)',
-          pointerEvents: 'none'
-        }}>
-          {toasts.map((t) => {
-            const isSuccess = t.type === 'success';
-            const isError = t.type === 'error';
-            const borderColor = isSuccess ? 'var(--secondary)' : isError ? 'var(--danger)' : 'var(--primary)';
-            return (
-              <div
-                key={t.id}
-                style={{
-                  pointerEvents: 'auto',
-                  background: 'var(--cards)',
-                  border: '1px solid var(--border)',
-                  borderLeft: `4px solid ${borderColor}`,
-                  borderRadius: 'var(--radius-md)',
-                  padding: '12px 14px',
-                  boxShadow: 'var(--shadow-lg)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  animation: 'fadeIn 0.2s ease-out'
-                }}
-              >
-                {isSuccess && <CheckCircle size={18} style={{ color: 'var(--secondary)', flexShrink: 0 }} />}
-                {isError && <AlertCircle size={18} style={{ color: 'var(--danger)', flexShrink: 0 }} />}
-                {!isSuccess && !isError && <Info size={18} style={{ color: 'var(--primary)', flexShrink: 0 }} />}
-                
-                <span style={{ fontSize: '13px', fontWeight: 500, color: 'var(--text)', flex: 1, lineHeight: 1.4 }}>
-                  {t.message}
-                </span>
-
-                <button
-                  type="button"
-                  onClick={() => removeToast(t.id)}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    color: 'var(--muted-text)',
-                    padding: '4px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    borderRadius: '4px'
-                  }}
-                  aria-label="Dismiss notification"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      {renderToasts()}
 
     </div>
   );
