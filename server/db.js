@@ -41,20 +41,40 @@ class FileStore {
   constructor(collectionName) {
     this.collectionName = collectionName;
     this.filePath = path.join(DATA_DIR, `${collectionName}.json`);
+    this.memoryData = null;
     this.init();
   }
 
   init() {
-    if (!fs.existsSync(this.filePath)) {
-      fs.writeFileSync(this.filePath, JSON.stringify([], null, 2));
+    try {
+      if (!fs.existsSync(this.filePath)) {
+        fs.writeFileSync(this.filePath, JSON.stringify([], null, 2));
+      }
+    } catch {
+      // Ignore write errors during initialization in read-only environments
     }
   }
 
   read() {
+    if (this.memoryData) return this.memoryData;
+
+    // Check if a mutated copy was written to /tmp in serverless
+    try {
+      const tmpPath = path.join('/tmp', 'gst_data', `${this.collectionName}.json`);
+      if (fs.existsSync(tmpPath)) {
+        const data = fs.readFileSync(tmpPath, 'utf-8');
+        this.memoryData = JSON.parse(data || '[]');
+        return this.memoryData;
+      }
+    } catch {
+      // Ignore
+    }
+
     try {
       if (!fs.existsSync(this.filePath)) return [];
       const data = fs.readFileSync(this.filePath, 'utf-8');
-      return JSON.parse(data || '[]');
+      this.memoryData = JSON.parse(data || '[]');
+      return this.memoryData;
     } catch (err) {
       console.error(`Error reading ${this.collectionName}:`, err);
       return [];
@@ -62,10 +82,20 @@ class FileStore {
   }
 
   write(data) {
+    this.memoryData = data;
     try {
       fs.writeFileSync(this.filePath, JSON.stringify(data, null, 2));
-    } catch (err) {
-      console.error(`Error writing ${this.collectionName}:`, err);
+    } catch {
+      // If filesystem is read-only (such as Vercel serverless), write to /tmp
+      try {
+        const tmpDir = path.join('/tmp', 'gst_data');
+        if (!fs.existsSync(tmpDir)) {
+          fs.mkdirSync(tmpDir, { recursive: true });
+        }
+        fs.writeFileSync(path.join(tmpDir, `${this.collectionName}.json`), JSON.stringify(data, null, 2));
+      } catch (tmpErr) {
+        console.warn(`Write fallback to /tmp failed for ${this.collectionName}:`, tmpErr.message);
+      }
     }
   }
 
