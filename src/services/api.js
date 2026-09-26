@@ -67,6 +67,8 @@ export const api = {
   // Auth
   login: (credentials) => request('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
   register: (data) => request('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
+  socialLogin: (payload) => request('/auth/social', { method: 'POST', body: JSON.stringify(payload) }),
+  passkeyLogin: (payload = {}) => request('/auth/passkey', { method: 'POST', body: JSON.stringify(payload) }),
   getMe: () => request('/auth/me'),
 
   // Business Profile

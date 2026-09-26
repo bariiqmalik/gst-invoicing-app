@@ -158,6 +158,35 @@ export default function App() {
     }
   };
 
+  const handleSocialLogin = async (payload) => {
+    try {
+      const res = await api.socialLogin(payload);
+      if (res.success && res.token) {
+        setAuthToken(res.token);
+        setCurrentUser(res.user);
+        await loadWorkspaceData();
+        const providerName = payload.provider?.toLowerCase() === 'google' ? 'Google' : 'Apple';
+        showToast(`Authenticated securely via ${providerName} SSO!`, 'success');
+      }
+    } catch (err) {
+      showToast(err.message || 'Social authentication encountered an error.', 'error');
+    }
+  };
+
+  const handlePasskeyLogin = async (payload = {}) => {
+    try {
+      const res = await api.passkeyLogin(payload);
+      if (res.success && res.token) {
+        setAuthToken(res.token);
+        setCurrentUser(res.user);
+        await loadWorkspaceData();
+        showToast('Authenticated via Biometric Passkey / Touch ID!', 'success');
+      }
+    } catch (err) {
+      showToast(err.message || 'Passkey verification failed.', 'error');
+    }
+  };
+
   const handleLogout = () => {
     setAuthToken('');
     setCurrentUser(null);
@@ -309,6 +338,8 @@ export default function App() {
       <LoginModal 
         onLogin={handleLogin} 
         onRegister={handleRegister} 
+        onSocialLogin={handleSocialLogin}
+        onPasskeyLogin={handlePasskeyLogin}
         theme={theme}
         onToggleTheme={toggleTheme}
       />
