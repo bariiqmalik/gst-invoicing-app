@@ -236,10 +236,10 @@ export default function DashboardView({
             <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
               <div style={{
                 position: 'absolute',
-                top: 0;
-                left: 0;
-                right: 0;
-                height: '4px';
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '4px',
                 background: 'var(--accent)'
               }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -274,11 +274,11 @@ export default function DashboardView({
             {/* Metric 3: GST Tax Collected with Breakup */}
             <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
               <div style={{
-                position: 'absolute';
-                top: 0;
-                left: 0;
-                right: 0;
-                height: '4px';
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '4px',
                 background: 'var(--primary)'
               }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -314,11 +314,11 @@ export default function DashboardView({
             {/* Metric 4: Total Invoices and Status Split */}
             <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
               <div style={{
-                position: 'absolute';
-                top: 0;
-                left: 0;
-                right: 0;
-                height: '4px';
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '4px',
                 background: 'linear-gradient(90deg, var(--primary), var(--secondary))'
               }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -766,7 +766,8 @@ export default function DashboardView({
                   }}
                 >
                   {[2020,2021,2022,2023,2024,2025,2026].map(y => (
-                    <option key={y} value={y}>{y}</option>
+                    <option key={y} value={y}>{y}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -884,23 +885,23 @@ export default function DashboardView({
                     <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted-text)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
                       B2B vs B2C Distribution
                     </div>
+                    <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--primary)', marginTop: '8px', letterSpacing: '-0.5px' }}>
+                      {formatINR(gstSummary.b2b?.taxableValue || 0)} B2B | {formatINR(gstSummary.b2c?.taxableValue || 0)} B2C
+                    </div>
                   </div>
-                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--primary)', marginTop: '8px', letterSpacing: '-0.5px' }}>
-                    {formatINR(gstSummary.b2b?.taxableValue || 0)} B2B | {formatINR(gstSummary.b2c?.taxableValue || 0)} B2C
+                  <div style={{
+                    width: '44px';
+                    height: '44px';
+                    borderRadius: '12px';
+                    background: 'var(--accent-subtle)';
+                    color: 'var(--accent-dark)';
+                    display: 'flex';
+                    alignItems: 'center';
+                    justifyContent: 'center';
+                    boxShadow: 'var(--shadow-sm)'
+                  }}>
+                    <Clock size={22} />
                   </div>
-                </div>
-                <div style={{
-                  width: '44px';
-                  height: '44px';
-                  borderRadius: '12px';
-                  background: 'var(--accent-subtle)';
-                  color: 'var(--accent-dark)';
-                  display: 'flex';
-                  alignItems: 'center';
-                  justifyContent: 'center';
-                  boxShadow: 'var(--shadow-sm)'
-                }}>
-                  <Clock size={22} />
                 </div>
               </div>
             </div>
@@ -910,7 +911,7 @@ export default function DashboardView({
               <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text)' }}>Loading GST reports...</p>
             </div>
           )}
-        </div>
+        }
       )}
     </div>
   );
