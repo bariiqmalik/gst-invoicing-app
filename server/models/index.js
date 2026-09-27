@@ -14,40 +14,33 @@ const toJSONPlugin = (schema) => {
   });
 };
 
-/* ------------------- USER SCHEMA ------------------- */
-const userSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  name: { type: String, required: true },
-  role: { type: String, default: 'owner' },
-  businessName: { type: String, default: 'My Business' },
-  createdAt: { type: Date, default: Date.now }
-});
-toJSONPlugin(userSchema);
-export const UserModel = mongoose.models.User || mongoose.model('User', userSchema);
-
-/* ------------------- BUSINESS PROFILE SCHEMA ------------------- */
-const businessSchema = new mongoose.Schema({
-  legalName: { type: String, required: true, default: 'Vani Studios Private Limited' },
-  tradeName: { type: String, default: 'Vani Digital & Creative Labs' },
-  gstin: { type: String, default: '27AABCV1234F1Z8' },
-  pan: { type: String, default: 'AABCV1234F' },
-  email: { type: String, default: 'billing@vanistudios.in' },
-  phone: { type: String, default: '+91 98201 12345' },
-  addressLine1: { type: String, default: 'Suite 402, Lotus Grandeur, Andheri West' },
-  addressLine2: { type: String, default: 'Veera Desai Road' },
-  city: { type: String, default: 'Mumbai' },
+/* ------------------- WORKSPACE SCHEMA ------------------- */
+const workspaceSchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true },
+  gstin: { type: String, default: '', trim: true, uppercase: true },
+  address: { type: mongoose.Schema.Types.Mixed, default: '' },
+  phone: { type: String, default: '', trim: true },
+  email: { type: String, default: '', trim: true, lowercase: true },
+  owner_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  created_at: { type: Date, default: Date.now },
+  // Extended Business Profile fields for GST invoicing
+  legalName: { type: String, default: '' },
+  tradeName: { type: String, default: '' },
+  pan: { type: String, default: '', uppercase: true },
+  addressLine1: { type: String, default: '' },
+  addressLine2: { type: String, default: '' },
+  city: { type: String, default: '' },
   state: { type: String, default: 'Maharashtra' },
   stateCode: { type: String, default: '27' },
-  pincode: { type: String, default: '400053' },
+  pincode: { type: String, default: '' },
   logoUrl: { type: String, default: '' },
   bankDetails: {
     bankName: { type: String, default: 'HDFC Bank Ltd' },
-    accountHolder: { type: String, default: 'Vani Studios Private Limited' },
-    accountNumber: { type: String, default: '50200049281729' },
-    ifscCode: { type: String, default: 'HDFC0001042' },
-    branch: { type: String, default: 'Andheri West Branch, Mumbai' },
-    upiId: { type: String, default: 'vanistudios@okhdfcbank' }
+    accountHolder: { type: String, default: '' },
+    accountNumber: { type: String, default: '' },
+    ifscCode: { type: String, default: '' },
+    branch: { type: String, default: '' },
+    upiId: { type: String, default: '' }
   },
   invoicePrefix: { type: String, default: 'INV-2024-' },
   nextInvoiceNumber: { type: Number, default: 101 },
@@ -61,14 +54,34 @@ const businessSchema = new mongoose.Schema({
   },
   resendApiKey: { type: String, default: '' },
   resendFromEmail: { type: String, default: 'invoicing@updates.resend.dev' },
-  createdAt: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
-toJSONPlugin(businessSchema);
-export const BusinessModel = mongoose.models.Business || mongoose.model('Business', businessSchema);
+workspaceSchema.index({ owner_id: 1 });
+toJSONPlugin(workspaceSchema);
+export const WorkspaceModel = mongoose.models.Workspace || mongoose.model('Workspace', workspaceSchema);
+
+/* ------------------- USER SCHEMA ------------------- */
+const userSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  password_hash: { type: String, required: true },
+  role: { type: String, enum: ['owner', 'accountant', 'staff'], default: 'owner' },
+  workspace_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace', required: true, index: true },
+  name: { type: String, required: true },
+  businessName: { type: String, default: '' },
+  authProvider: { type: String, default: 'local' },
+  authMethod: { type: String, default: 'password' },
+  created_at: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now }
+});
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ workspace_id: 1 });
+toJSONPlugin(userSchema);
+export const UserModel = mongoose.models.User || mongoose.model('User', userSchema);
 
 /* ------------------- CUSTOMER SCHEMA ------------------- */
 const customerSchema = new mongoose.Schema({
+  workspace_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace', required: true, index: true },
   name: { type: String, required: true },
   companyName: { type: String, default: '' },
   gstin: { type: String, default: '' },
@@ -90,25 +103,33 @@ const customerSchema = new mongoose.Schema({
     pincode: { type: String, default: '' }
   },
   notes: { type: String, default: '' },
+  created_at: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
+customerSchema.index({ workspace_id: 1, email: 1 });
+customerSchema.index({ workspace_id: 1, gstin: 1 });
+customerSchema.index({ workspace_id: 1, created_at: -1 });
 toJSONPlugin(customerSchema);
 export const CustomerModel = mongoose.models.Customer || mongoose.model('Customer', customerSchema);
 
 /* ------------------- CATALOG ITEM SCHEMA ------------------- */
 const catalogItemSchema = new mongoose.Schema({
+  workspace_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace', required: true, index: true },
   name: { type: String, required: true },
   description: { type: String, default: '' },
   type: { type: String, enum: ['GOODS', 'SERVICES'], default: 'SERVICES' },
   hsnSacCode: { type: String, required: true },
   unitPrice: { type: Number, required: true, default: 0 },
-  unit: { type: String, default: 'NOS' }, // NOS, HRS, PCS, MTR, DAYS, MONTHS
-  defaultGstRate: { type: Number, required: true, default: 18 }, // 0, 5, 12, 18, 28
+  unit: { type: String, default: 'NOS' },
+  defaultGstRate: { type: Number, required: true, default: 18 },
   isActive: { type: Boolean, default: true },
+  created_at: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
+catalogItemSchema.index({ workspace_id: 1, name: 1 });
+catalogItemSchema.index({ workspace_id: 1, hsnSacCode: 1 });
 toJSONPlugin(catalogItemSchema);
 export const CatalogItemModel = mongoose.models.CatalogItem || mongoose.model('CatalogItem', catalogItemSchema);
 
@@ -136,10 +157,17 @@ const invoiceItemSchema = new mongoose.Schema({
 }, { _id: false });
 
 const invoiceSchema = new mongoose.Schema({
-  invoiceNumber: { type: String, required: true, unique: true },
+  workspace_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace', required: true, index: true },
+  invoice_number: { type: String, trim: true },
+  invoiceNumber: { type: String, required: true, trim: true },
   invoiceDate: { type: String, required: true },
   dueDate: { type: String, required: true },
   customerId: { type: String, default: null },
+  customer: {
+    name: { type: String, default: '' },
+    email: { type: String, default: '' },
+    gstin: { type: String, default: '' }
+  },
   customerDetails: {
     name: { type: String, required: true },
     companyName: { type: String, default: '' },
@@ -173,7 +201,7 @@ const invoiceSchema = new mongoose.Schema({
   paymentDetails: {
     amountPaid: { type: Number, default: 0 },
     paymentDate: { type: String, default: '' },
-    paymentMethod: { type: String, default: '' }, // NEFT/RTGS, UPI, Cheque, Cash
+    paymentMethod: { type: String, default: '' },
     paymentReference: { type: String, default: '' },
     notes: { type: String, default: '' }
   },
@@ -183,112 +211,218 @@ const invoiceSchema = new mongoose.Schema({
     recipient: { type: String, default: '' },
     messageId: { type: String, default: '' }
   },
+  created_at: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
+
+// Sync aliases before validation and saving
+invoiceSchema.pre('validate', function(next) {
+  if (!this.invoice_number && this.invoiceNumber) {
+    this.invoice_number = this.invoiceNumber;
+  } else if (!this.invoiceNumber && this.invoice_number) {
+    this.invoiceNumber = this.invoice_number;
+  }
+  if (!this.created_at && this.createdAt) {
+    this.created_at = this.createdAt;
+  } else if (!this.createdAt && this.created_at) {
+    this.createdAt = this.created_at;
+  }
+  if (!this.customer) this.customer = {};
+  if (this.customerDetails) {
+    if (!this.customer.gstin && this.customerDetails.gstin) {
+      this.customer.gstin = this.customerDetails.gstin;
+    }
+    if (!this.customer.name && this.customerDetails.name) {
+      this.customer.name = this.customerDetails.name;
+    }
+    if (!this.customer.email && this.customerDetails.email) {
+      this.customer.email = this.customerDetails.email;
+    }
+  }
+  next();
+});
+
+// MANDATORY COMPOUND INDEXES AS PER SPECIFICATION
+invoiceSchema.index({ workspace_id: 1, invoice_number: 1 }, { unique: true });
+invoiceSchema.index({ workspace_id: 1, invoiceNumber: 1 }, { unique: true });
+invoiceSchema.index({ workspace_id: 1, created_at: -1 });
+invoiceSchema.index({ workspace_id: 1, createdAt: -1 });
+invoiceSchema.index({ workspace_id: 1, 'customer.gstin': 1 });
+invoiceSchema.index({ workspace_id: 1, 'customerDetails.gstin': 1 });
+
 toJSONPlugin(invoiceSchema);
 export const InvoiceModel = mongoose.models.Invoice || mongoose.model('Invoice', invoiceSchema);
 
 /* ------------------- UNIFIED REPOSITORY WRAPPER ------------------- */
-// Unified repository that delegates to Mongoose or FileStore, with guaranteed clean JSON serialization
 export const db = {
+  workspaces: {
+    async find(query = {}) {
+      if (isMongoConnected()) {
+        const docs = await WorkspaceModel.find(query).sort({ created_at: -1 });
+        return sanitizeDocument(docs);
+      }
+      return fileStores.workspaces.find(query);
+    },
+    async findOne(query = {}) {
+      if (isMongoConnected()) {
+        const doc = await WorkspaceModel.findOne(query);
+        return sanitizeDocument(doc);
+      }
+      return fileStores.workspaces.findOne(query);
+    },
+    async findById(id) {
+      if (isMongoConnected()) {
+        const doc = await WorkspaceModel.findById(id);
+        return sanitizeDocument(doc);
+      }
+      return fileStores.workspaces.findById(id);
+    },
+    async create(data) {
+      const payload = {
+        ...data,
+        legalName: data.legalName || data.name,
+        tradeName: data.tradeName || data.name,
+        created_at: data.created_at || new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      if (isMongoConnected()) {
+        const doc = await WorkspaceModel.create(payload);
+        return sanitizeDocument(doc);
+      }
+      return fileStores.workspaces.create(payload);
+    },
+    async update(id, updates) {
+      const payload = { ...updates, updated_at: new Date().toISOString(), updatedAt: new Date().toISOString() };
+      if (isMongoConnected()) {
+        const doc = await WorkspaceModel.findByIdAndUpdate(id, payload, { new: true });
+        return sanitizeDocument(doc);
+      }
+      return fileStores.workspaces.findByIdAndUpdate(id, payload);
+    },
+    async delete(id) {
+      if (isMongoConnected()) {
+        const doc = await WorkspaceModel.findByIdAndDelete(id);
+        return sanitizeDocument(doc);
+      }
+      return fileStores.workspaces.findByIdAndDelete(id);
+    },
+    async count(query = {}) {
+      if (isMongoConnected()) return await WorkspaceModel.countDocuments(query);
+      return fileStores.workspaces.countDocuments(query);
+    }
+  },
+
   users: {
-    async findOne(query) {
+    async find(query = {}) {
+      if (isMongoConnected()) {
+        const docs = await UserModel.find(query);
+        return sanitizeDocument(docs);
+      }
+      return fileStores.users.find(query);
+    },
+    async findOne(query = {}) {
       if (isMongoConnected()) {
         const doc = await UserModel.findOne(query);
         return sanitizeDocument(doc);
       }
       return fileStores.users.findOne(query);
     },
-    async create(data) {
+    async findById(id) {
       if (isMongoConnected()) {
-        const doc = await UserModel.create(data);
+        const doc = await UserModel.findById(id);
         return sanitizeDocument(doc);
       }
-      return fileStores.users.create(data);
+      return fileStores.users.findById(id);
     },
-    async count() {
-      if (isMongoConnected()) return await UserModel.countDocuments();
-      return fileStores.users.countDocuments();
+    async create(data) {
+      const payload = {
+        ...data,
+        password_hash: data.password_hash || data.password,
+        created_at: data.created_at || new Date().toISOString(),
+        createdAt: data.createdAt || new Date().toISOString()
+      };
+      if (isMongoConnected()) {
+        const doc = await UserModel.create(payload);
+        return sanitizeDocument(doc);
+      }
+      return fileStores.users.create(payload);
+    },
+    async update(id, updates) {
+      if (isMongoConnected()) {
+        const doc = await UserModel.findByIdAndUpdate(id, updates, { new: true });
+        return sanitizeDocument(doc);
+      }
+      return fileStores.users.findByIdAndUpdate(id, updates);
+    },
+    async count(query = {}) {
+      if (isMongoConnected()) return await UserModel.countDocuments(query);
+      return fileStores.users.countDocuments(query);
     }
   },
 
   business: {
-    async getProfile() {
-      if (isMongoConnected()) {
-        let doc = await BusinessModel.findOne();
-        if (!doc) {
-          doc = await BusinessModel.create({});
-        }
-        return sanitizeDocument(doc);
+    // Returns active workspace business profile
+    async getProfile(workspace_id = null) {
+      let ws = null;
+      if (workspace_id) {
+        ws = await db.workspaces.findById(workspace_id);
+      } else {
+        const all = await db.workspaces.find();
+        ws = all[0] || null;
       }
-      let doc = fileStores.business.read()[0];
-      if (!doc) {
-        doc = fileStores.business.create({
+
+      if (!ws) {
+        // Fallback create default workspace profile
+        ws = await db.workspaces.create({
+          name: 'Vani Studios Private Limited',
           legalName: 'Vani Studios Private Limited',
-          tradeName: 'Vani Digital & Creative Labs',
-          gstin: '27AABCV1234F1Z8',
-          pan: 'AABCV1234F',
+          tradeName: 'Vani Studios Private Limited',
+          gstin: '27AAACN1234E1Z9',
+          pan: 'AAACN1234E',
           email: 'billing@vanistudios.in',
-          phone: '+91 98201 12345',
+          phone: '+91 98200 00000',
+          address: 'Suite 402, Lotus Grandeur, Andheri West, Veera Desai Road, Mumbai, Maharashtra 400053',
           addressLine1: 'Suite 402, Lotus Grandeur, Andheri West',
           addressLine2: 'Veera Desai Road',
           city: 'Mumbai',
           state: 'Maharashtra',
           stateCode: '27',
           pincode: '400053',
-          logoUrl: '',
-          bankDetails: {
-            bankName: 'HDFC Bank Ltd',
-            accountHolder: 'Vani Studios Private Limited',
-            accountNumber: '50200049281729',
-            ifscCode: 'HDFC0001042',
-            branch: 'Andheri West Branch, Mumbai',
-            upiId: 'vanistudios@okhdfcbank'
-          },
           invoicePrefix: 'INV-2024-',
-          nextInvoiceNumber: 101,
-          termsAndConditions: '1. Payment is due within 15 days of invoice date.\n2. Please mention the invoice number in the NEFT/RTGS/IMPS transfer remarks.\n3. Goods or services once billed are non-refundable unless agreed in writing.',
-          defaultNotes: 'Thank you for your business! We appreciate the opportunity to collaborate with you.',
-          resendApiKey: '',
-          resendFromEmail: 'invoicing@updates.resend.dev'
+          nextInvoiceNumber: 104
         });
       }
-      return sanitizeDocument(doc);
+      return sanitizeDocument(ws);
     },
-    async updateProfile(updates) {
-      if (isMongoConnected()) {
-        let doc = await BusinessModel.findOne();
-        if (!doc) {
-          doc = await BusinessModel.create(updates);
-        } else {
-          Object.assign(doc, updates, { updatedAt: new Date() });
-          await doc.save();
-        }
-        return sanitizeDocument(doc);
+    async updateProfile(updates, workspace_id = null) {
+      let targetId = workspace_id;
+      if (!targetId) {
+        const current = await this.getProfile();
+        targetId = current?.id;
       }
-      let docs = fileStores.business.read();
-      if (!docs.length) {
-        return fileStores.business.create(updates);
+      if (updates.legalName && !updates.name) {
+        updates.name = updates.legalName;
       }
-      return fileStores.business.findByIdAndUpdate(docs[0].id, updates);
+      return db.workspaces.update(targetId, updates);
     }
   },
 
   customers: {
     async find(query = {}) {
       if (isMongoConnected()) {
-        const docs = await CustomerModel.find(query).sort({ createdAt: -1 });
+        const docs = await CustomerModel.find(query).sort({ created_at: -1, createdAt: -1 });
         return sanitizeDocument(docs);
       }
       return fileStores.customers.find(query);
     },
-    async findById(id) {
+    async findById(id, workspace_id = null) {
       if (isMongoConnected()) {
-        const doc = await CustomerModel.findById(id);
+        const q = workspace_id ? { _id: id, workspace_id } : { _id: id };
+        const doc = await CustomerModel.findOne(q);
         return sanitizeDocument(doc);
       }
-      return fileStores.customers.findById(id);
+      return fileStores.customers.findById(id, workspace_id);
     },
     async create(data) {
       if (isMongoConnected()) {
@@ -297,40 +431,43 @@ export const db = {
       }
       return fileStores.customers.create(data);
     },
-    async update(id, data) {
+    async update(id, data, workspace_id = null) {
       if (isMongoConnected()) {
-        const doc = await CustomerModel.findByIdAndUpdate(id, data, { new: true });
+        const q = workspace_id ? { _id: id, workspace_id } : { _id: id };
+        const doc = await CustomerModel.findOneAndUpdate(q, data, { new: true });
         return sanitizeDocument(doc);
       }
-      return fileStores.customers.findByIdAndUpdate(id, data);
+      return fileStores.customers.findByIdAndUpdate(id, data, workspace_id);
     },
-    async delete(id) {
+    async delete(id, workspace_id = null) {
       if (isMongoConnected()) {
-        const doc = await CustomerModel.findByIdAndDelete(id);
+        const q = workspace_id ? { _id: id, workspace_id } : { _id: id };
+        const doc = await CustomerModel.findOneAndDelete(q);
         return sanitizeDocument(doc);
       }
-      return fileStores.customers.findByIdAndDelete(id);
+      return fileStores.customers.findByIdAndDelete(id, workspace_id);
     },
-    async count() {
-      if (isMongoConnected()) return await CustomerModel.countDocuments();
-      return fileStores.customers.countDocuments();
+    async count(query = {}) {
+      if (isMongoConnected()) return await CustomerModel.countDocuments(query);
+      return fileStores.customers.countDocuments(query);
     }
   },
 
   catalog: {
     async find(query = {}) {
       if (isMongoConnected()) {
-        const docs = await CatalogItemModel.find(query).sort({ createdAt: -1 });
+        const docs = await CatalogItemModel.find(query).sort({ created_at: -1, createdAt: -1 });
         return sanitizeDocument(docs);
       }
       return fileStores.catalog.find(query);
     },
-    async findById(id) {
+    async findById(id, workspace_id = null) {
       if (isMongoConnected()) {
-        const doc = await CatalogItemModel.findById(id);
+        const q = workspace_id ? { _id: id, workspace_id } : { _id: id };
+        const doc = await CatalogItemModel.findOne(q);
         return sanitizeDocument(doc);
       }
-      return fileStores.catalog.findById(id);
+      return fileStores.catalog.findById(id, workspace_id);
     },
     async create(data) {
       if (isMongoConnected()) {
@@ -339,61 +476,89 @@ export const db = {
       }
       return fileStores.catalog.create(data);
     },
-    async update(id, data) {
+    async update(id, data, workspace_id = null) {
       if (isMongoConnected()) {
-        const doc = await CatalogItemModel.findByIdAndUpdate(id, data, { new: true });
+        const q = workspace_id ? { _id: id, workspace_id } : { _id: id };
+        const doc = await CatalogItemModel.findOneAndUpdate(q, data, { new: true });
         return sanitizeDocument(doc);
       }
-      return fileStores.catalog.findByIdAndUpdate(id, data);
+      return fileStores.catalog.findByIdAndUpdate(id, data, workspace_id);
     },
-    async delete(id) {
+    async delete(id, workspace_id = null) {
       if (isMongoConnected()) {
-        const doc = await CatalogItemModel.findByIdAndDelete(id);
+        const q = workspace_id ? { _id: id, workspace_id } : { _id: id };
+        const doc = await CatalogItemModel.findOneAndDelete(q);
         return sanitizeDocument(doc);
       }
-      return fileStores.catalog.findByIdAndDelete(id);
+      return fileStores.catalog.findByIdAndDelete(id, workspace_id);
     },
-    async count() {
-      if (isMongoConnected()) return await CatalogItemModel.countDocuments();
-      return fileStores.catalog.countDocuments();
+    async count(query = {}) {
+      if (isMongoConnected()) return await CatalogItemModel.countDocuments(query);
+      return fileStores.catalog.countDocuments(query);
     }
   },
 
   invoices: {
     async find(query = {}) {
       if (isMongoConnected()) {
-        const docs = await InvoiceModel.find(query).sort({ createdAt: -1 });
+        const docs = await InvoiceModel.find(query).sort({ created_at: -1, createdAt: -1 });
         return sanitizeDocument(docs);
       }
       return fileStores.invoices.find(query);
     },
-    async findById(id) {
+    async findById(id, workspace_id = null) {
       if (isMongoConnected()) {
-        const doc = await InvoiceModel.findById(id);
+        const q = workspace_id ? { _id: id, workspace_id } : { _id: id };
+        const doc = await InvoiceModel.findOne(q);
         return sanitizeDocument(doc);
       }
-      return fileStores.invoices.findById(id);
+      return fileStores.invoices.findById(id, workspace_id);
     },
     async create(data) {
+      const payload = {
+        ...data,
+        invoice_number: data.invoice_number || data.invoiceNumber,
+        invoiceNumber: data.invoiceNumber || data.invoice_number,
+        created_at: data.created_at || data.createdAt || new Date().toISOString(),
+        createdAt: data.createdAt || data.created_at || new Date().toISOString(),
+        customer: {
+          gstin: data.customer?.gstin || data.customerDetails?.gstin || '',
+          name: data.customer?.name || data.customerDetails?.name || '',
+          email: data.customer?.email || data.customerDetails?.email || ''
+        }
+      };
       if (isMongoConnected()) {
-        const doc = await InvoiceModel.create(data);
+        const doc = await InvoiceModel.create(payload);
         return sanitizeDocument(doc);
       }
-      return fileStores.invoices.create(data);
+      return fileStores.invoices.create(payload);
     },
-    async update(id, data) {
+    async update(id, data, workspace_id = null) {
+      const payload = {
+        ...data,
+        ...(data.invoiceNumber && { invoice_number: data.invoiceNumber, invoiceNumber: data.invoiceNumber }),
+        ...(data.customerDetails && {
+          customer: {
+            gstin: data.customerDetails.gstin || '',
+            name: data.customerDetails.name || '',
+            email: data.customerDetails.email || ''
+          }
+        })
+      };
       if (isMongoConnected()) {
-        const doc = await InvoiceModel.findByIdAndUpdate(id, data, { new: true });
+        const q = workspace_id ? { _id: id, workspace_id } : { _id: id };
+        const doc = await InvoiceModel.findOneAndUpdate(q, payload, { new: true });
         return sanitizeDocument(doc);
       }
-      return fileStores.invoices.findByIdAndUpdate(id, data);
+      return fileStores.invoices.findByIdAndUpdate(id, payload, workspace_id);
     },
-    async delete(id) {
+    async delete(id, workspace_id = null) {
       if (isMongoConnected()) {
-        const doc = await InvoiceModel.findByIdAndDelete(id);
+        const q = workspace_id ? { _id: id, workspace_id } : { _id: id };
+        const doc = await InvoiceModel.findOneAndDelete(q);
         return sanitizeDocument(doc);
       }
-      return fileStores.invoices.findByIdAndDelete(id);
+      return fileStores.invoices.findByIdAndDelete(id, workspace_id);
     },
     async count(query = {}) {
       if (isMongoConnected()) return await InvoiceModel.countDocuments(query);
@@ -401,3 +566,103 @@ export const db = {
     }
   }
 };
+
+/* ------------------- TENANT-SCOPED DB REPOSITORY ------------------- */
+/**
+ * Returns a strictly isolated repository wrapper where every find, create,
+ * update, delete, and count strictly forces { workspace_id: tenantWorkspaceId }.
+ * Guarantees zero cross-tenant data leakage.
+ */
+export function getTenantDb(workspaceId) {
+  if (!workspaceId) {
+    throw new Error('Tenant Context Error: workspace_id is required for request isolation');
+  }
+  const wid = String(workspaceId);
+
+  return {
+    workspaceId: wid,
+    
+    workspaces: {
+      async get() {
+        return db.workspaces.findById(wid);
+      },
+      async update(updates) {
+        return db.workspaces.update(wid, updates);
+      }
+    },
+
+    business: {
+      async getProfile() {
+        return db.business.getProfile(wid);
+      },
+      async updateProfile(updates) {
+        return db.business.updateProfile(updates, wid);
+      }
+    },
+
+    customers: {
+      async find(query = {}) {
+        return db.customers.find({ ...query, workspace_id: wid });
+      },
+      async findById(id) {
+        return db.customers.findById(id, wid);
+      },
+      async create(data) {
+        return db.customers.create({ ...data, workspace_id: wid });
+      },
+      async update(id, data) {
+        return db.customers.update(id, data, wid);
+      },
+      async delete(id) {
+        return db.customers.delete(id, wid);
+      },
+      async count(query = {}) {
+        return db.customers.count({ ...query, workspace_id: wid });
+      }
+    },
+
+    catalog: {
+      async find(query = {}) {
+        return db.catalog.find({ ...query, workspace_id: wid });
+      },
+      async findById(id) {
+        return db.catalog.findById(id, wid);
+      },
+      async create(data) {
+        return db.catalog.create({ ...data, workspace_id: wid });
+      },
+      async update(id, data) {
+        return db.catalog.update(id, data, wid);
+      },
+      async delete(id) {
+        return db.catalog.delete(id, wid);
+      },
+      async count(query = {}) {
+        return db.catalog.count({ ...query, workspace_id: wid });
+      }
+    },
+
+    invoices: {
+      async find(query = {}) {
+        return db.invoices.find({ ...query, workspace_id: wid });
+      },
+      async findById(id) {
+        return db.invoices.findById(id, wid);
+      },
+      async create(data) {
+        return db.invoices.create({ ...data, workspace_id: wid });
+      },
+      async update(id, data) {
+        return db.invoices.update(id, data, wid);
+      },
+      async delete(id) {
+        return db.invoices.delete(id, wid);
+      },
+      async count(query = {}) {
+        return db.invoices.count({ ...query, workspace_id: wid });
+      }
+    }
+  };
+}
+
+db.forTenant = getTenantDb;

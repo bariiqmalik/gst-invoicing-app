@@ -103,7 +103,11 @@ class FileStore {
     const items = this.read();
     return items.filter(item => {
       for (const [k, v] of Object.entries(query)) {
-        if (item[k] !== v) return false;
+        if (v === undefined || v === null) continue;
+        const itemVal = item[k];
+        if (itemVal !== v && String(itemVal) !== String(v)) {
+          return false;
+        }
       }
       return true;
     }).map(sanitizeDocument);
@@ -113,16 +117,27 @@ class FileStore {
     const items = this.read();
     const item = items.find(i => {
       for (const [k, v] of Object.entries(query)) {
-        if (i[k] !== v) return false;
+        if (v === undefined || v === null) continue;
+        const itemVal = i[k];
+        if (itemVal !== v && String(itemVal) !== String(v)) {
+          return false;
+        }
       }
       return true;
     });
     return item ? sanitizeDocument(item) : null;
   }
 
-  findById(id) {
+  findById(id, workspace_id = null) {
     const items = this.read();
-    const item = items.find(i => (i.id === id || i._id === id));
+    const item = items.find(i => {
+      const idMatch = (i.id === id || i._id === id || String(i.id) === String(id) || String(i._id) === String(id));
+      if (!idMatch) return false;
+      if (workspace_id && i.workspace_id && String(i.workspace_id) !== String(workspace_id)) {
+        return false;
+      }
+      return true;
+    });
     return item ? sanitizeDocument(item) : null;
   }
 
@@ -131,7 +146,8 @@ class FileStore {
     const newDoc = {
       ...doc,
       id: doc.id || ('id_' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5)),
-      createdAt: doc.createdAt || new Date().toISOString(),
+      createdAt: doc.createdAt || doc.created_at || new Date().toISOString(),
+      created_at: doc.created_at || doc.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
     items.unshift(newDoc);
@@ -139,9 +155,16 @@ class FileStore {
     return sanitizeDocument(newDoc);
   }
 
-  findByIdAndUpdate(id, updates) {
+  findByIdAndUpdate(id, updates, workspace_id = null) {
     const items = this.read();
-    const idx = items.findIndex(i => (i.id === id || i._id === id));
+    const idx = items.findIndex(i => {
+      const idMatch = (i.id === id || i._id === id || String(i.id) === String(id) || String(i._id) === String(id));
+      if (!idMatch) return false;
+      if (workspace_id && i.workspace_id && String(i.workspace_id) !== String(workspace_id)) {
+        return false;
+      }
+      return true;
+    });
     if (idx === -1) return null;
     const updated = {
       ...items[idx],
@@ -154,11 +177,18 @@ class FileStore {
     return sanitizeDocument(updated);
   }
 
-  findByIdAndDelete(id) {
+  findByIdAndDelete(id, workspace_id = null) {
     let items = this.read();
-    const item = items.find(i => (i.id === id || i._id === id));
+    const item = items.find(i => {
+      const idMatch = (i.id === id || i._id === id || String(i.id) === String(id) || String(i._id) === String(id));
+      if (!idMatch) return false;
+      if (workspace_id && i.workspace_id && String(i.workspace_id) !== String(workspace_id)) {
+        return false;
+      }
+      return true;
+    });
     if (!item) return null;
-    items = items.filter(i => (i.id !== id && i._id !== id));
+    items = items.filter(i => (i.id !== item.id && i._id !== item.id));
     this.write(items);
     return sanitizeDocument(item);
   }
@@ -169,6 +199,7 @@ class FileStore {
 }
 
 export const fileStores = {
+  workspaces: new FileStore('workspaces'),
   users: new FileStore('users'),
   business: new FileStore('business'),
   customers: new FileStore('customers'),

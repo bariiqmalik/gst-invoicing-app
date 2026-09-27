@@ -9,6 +9,7 @@ import catalogRoutes from './routes/catalog.js';
 import invoiceRoutes from './routes/invoices.js';
 import emailRoutes from './routes/email.js';
 import dashboardRoutes from './routes/dashboard.js';
+import reportRoutes from './routes/reports.js';
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.use('/api/invoices', invoiceRoutes);
 app.use('/api/invoices', emailRoutes);
 app.use('/api/email', emailRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/reports', reportRoutes);
 
 // 404 JSON Handler for unmatched /api routes
 app.use('/api', (req, res) => {
