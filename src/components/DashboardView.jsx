@@ -195,14 +195,7 @@ export default function DashboardView({
           }}>
             {/* Metric 1: Revenue Collected */}
             <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '4px',
-                background: 'var(--secondary)'
-              }} />
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'var(--secondary)' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted-text)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
@@ -232,16 +225,9 @@ export default function DashboardView({
               </div>
             </div>
 
-            {/* Metric 2: Outstanding Receivables */}
+            {/* Metric 2: Outstanding Receivables - SEMICOLON FIXED */}
             <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '4px',
-                background: 'var(--accent)'
-              }} />
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'var(--accent)' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted-text)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
@@ -273,14 +259,7 @@ export default function DashboardView({
 
             {/* Metric 3: GST Tax Collected with Breakup */}
             <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '4px',
-                background: 'var(--primary)'
-              }} />
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'var(--primary)' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted-text)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
@@ -313,14 +292,7 @@ export default function DashboardView({
 
             {/* Metric 4: Total Invoices and Status Split */}
             <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '4px',
-                background: 'linear-gradient(90deg, var(--primary), var(--secondary))'
-              }} />
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(90deg, var(--primary), var(--secondary))' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted-text)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
