@@ -136,7 +136,7 @@ export default function InvoicePreviewModal({
         {/* ── Control Bar (hidden on print) ───────────────────────── */}
         <div className="no-print" style={{
           padding: '14px 24px',
-          background: 'var(--primary)',
+          background: 'var(--gothic-espresso)',
           color: '#ffffff',
           display: 'flex',
           justifyContent: 'space-between',
@@ -268,7 +268,7 @@ export default function InvoicePreviewModal({
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'flex-start',
-              borderBottom: '2.5px solid var(--primary)',
+              borderBottom: '2.5px solid var(--gothic-espresso)',
               paddingBottom: '18px',
               marginBottom: '18px'
             }}>
@@ -280,7 +280,7 @@ export default function InvoicePreviewModal({
                   ) : (
                     <div style={{
                       width: '42px', height: '42px', borderRadius: '8px',
-                      background: 'var(--primary)', color: '#ffffff',
+                      background: 'var(--gothic-espresso)', color: '#ffffff',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontWeight: 800, fontSize: '18px', flexShrink: 0
                     }}>
@@ -288,7 +288,7 @@ export default function InvoicePreviewModal({
                     </div>
                   )}
                   <div>
-                    <h2 style={{ fontSize: '19px', margin: 0, color: 'var(--primary)', lineHeight: 1.1 }} className="print-primary-color">
+                    <h2 style={{ fontSize: '19px', margin: 0, color: 'var(--gothic-espresso)', lineHeight: 1.1 }} className="print-primary-color">
                       {business?.legalName || 'Business Name'}
                     </h2>
                     {business?.tradeName && (
@@ -302,10 +302,10 @@ export default function InvoicePreviewModal({
                   <div>{business?.city}, {business?.state} — {business?.pincode}</div>
                   <div>Phone: {business?.phone || 'N/A'} &nbsp;•&nbsp; Email: {business?.email || 'N/A'}</div>
                   <div style={{ marginTop: '5px', fontWeight: 700 }}>
-                    <span style={{ color: 'var(--primary)' }} className="print-primary-color">GSTIN:&nbsp;</span>
+                    <span style={{ color: 'var(--gothic-espresso)' }} className="print-primary-color">GSTIN:&nbsp;</span>
                     <span style={{ fontFamily: 'monospace', letterSpacing: '0.04em' }}>{business?.gstin || 'N/A'}</span>
                     &nbsp;&nbsp;
-                    <span style={{ color: 'var(--primary)' }} className="print-primary-color">State Code:&nbsp;</span>
+                    <span style={{ color: 'var(--gothic-espresso)' }} className="print-primary-color">State Code:&nbsp;</span>
                     <span style={{ fontFamily: 'monospace' }}>{supplierStateCode}</span>
                   </div>
                   <div>
@@ -320,7 +320,7 @@ export default function InvoicePreviewModal({
               <div style={{ textAlign: 'right', flexShrink: 0 }}>
                 <div style={{
                   display: 'inline-block',
-                  background: 'var(--primary)',
+                  background: 'var(--gothic-espresso)',
                   color: '#ffffff',
                   padding: '6px 18px',
                   borderRadius: '5px',
@@ -337,7 +337,7 @@ export default function InvoicePreviewModal({
                 <div style={{ marginTop: '14px', fontSize: '13px', lineHeight: 1.7 }}>
                   <div>
                     Invoice No:&nbsp;
-                    <strong style={{ fontFamily: 'monospace', fontSize: '13px', color: 'var(--primary)' }} className="print-primary-color">
+                    <strong style={{ fontFamily: 'monospace', fontSize: '13px', color: 'var(--gothic-espresso)' }} className="print-primary-color">
                       {invoice.invoiceNumber}
                     </strong>
                   </div>

@@ -57,14 +57,14 @@ export default function Navbar({
               width: '38px',
               height: '38px',
               borderRadius: '10px',
-              background: 'var(--primary)',
+              background: 'var(--gothic-espresso)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#ffffff',
-              boxShadow: '0 3px 8px rgba(18,59,93,0.25)'
+              boxShadow: '0 3px 8px rgba(0,0,0,0.18)'
             }}>
-              <FileText size={20} color="var(--accent)" />
+              <FileText size={20} color="var(--gothic-light)" />
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -75,13 +75,13 @@ export default function Navbar({
                   letterSpacing: '-0.3px',
                   color: 'var(--primary)'
                 }}>
-                  BillGST<span style={{ color: 'var(--accent)' }}>.Pro</span>
+                  BillGST<span style={{ color: 'var(--gothic-taupe)' }}>.Pro</span>
                 </span>
                 <span style={{
                   fontSize: '10px',
-                  background: 'var(--accent-subtle)',
-                  color: 'var(--accent-dark)',
-                  border: '1px solid var(--warning-border)',
+                  background: 'var(--bg-subtle)',
+                  color: 'var(--text)',
+                  border: '1px solid var(--border)',
                   padding: '2px 6px',
                   borderRadius: '4px',
                   fontWeight: 700
@@ -112,7 +112,7 @@ export default function Navbar({
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button 
             id="quick-create-invoice-btn"
-            className="btn btn-accent btn-sm"
+            className="btn btn-primary btn-sm"
             onClick={onOpenCreateInvoice}
             style={{ fontWeight: 700 }}
           >
@@ -138,7 +138,7 @@ export default function Navbar({
           >
             {theme === 'dark' ? (
               <>
-                <Sun size={15} style={{ color: 'var(--accent)' }} />
+                <Sun size={15} style={{ color: '#E5A54B' }} />
                 <span style={{ fontSize: '12px', fontWeight: 600 }}>Light</span>
               </>
             ) : (
@@ -162,7 +162,7 @@ export default function Navbar({
               width: '26px',
               height: '26px',
               borderRadius: '50%',
-              background: 'var(--primary)',
+              background: 'var(--gothic-espresso)',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
@@ -176,8 +176,8 @@ export default function Navbar({
               <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text)' }}>
                 {user?.name || 'Owner'}
               </div>
-              <div style={{ fontSize: '10px', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '3px', fontWeight: 600 }}>
-                <ShieldCheck size={10} /> Owner Access
+              <div style={{ fontSize: '10px', color: 'var(--muted-text)', display: 'flex', alignItems: 'center', gap: '3px', fontWeight: 600 }}>
+                <ShieldCheck size={10} color="var(--accent)" /> Owner Access
               </div>
             </div>
           </div>
@@ -222,17 +222,17 @@ export default function Navbar({
                 gap: '8px',
                 padding: '12px 16px',
                 fontSize: '14px',
-                fontWeight: isActive ? 600 : 500,
+                fontWeight: isActive ? 700 : 500,
                 color: isActive ? 'var(--primary)' : 'var(--muted-text)',
                 background: 'transparent',
                 border: 'none',
-                borderBottom: isActive ? '2px solid var(--secondary)' : '2px solid transparent',
+                borderBottom: isActive ? '2px solid var(--primary)' : '2px solid transparent',
                 cursor: 'pointer',
                 transition: 'all 0.15s ease',
                 whiteSpace: 'nowrap'
               }}
             >
-              <Icon size={16} color={isActive ? 'var(--secondary)' : 'var(--muted-text)'} />
+              <Icon size={16} color={isActive ? 'var(--primary)' : 'var(--muted-text)'} />
               <span>{tab.label}</span>
             </button>
           );

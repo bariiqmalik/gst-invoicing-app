@@ -305,7 +305,7 @@ export default function LoginModal({
         flexDirection: 'column',
         justifyContent: 'space-between',
         padding: '50px 60px',
-        background: 'radial-gradient(ellipse at 20% 20%, rgba(230, 162, 60, 0.15) 0%, rgba(18, 59, 93, 0.98) 75%), var(--primary-dark)',
+        background: 'radial-gradient(ellipse at 25% 25%, rgba(152, 134, 134, 0.22) 0%, rgba(92, 78, 78, 0.35) 45%, #000000 100%)',
         borderRight: '1px solid rgba(221, 227, 232, 0.12)',
         position: 'relative',
         overflow: 'hidden'
@@ -327,13 +327,13 @@ export default function LoginModal({
               width: '44px',
               height: '44px',
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%)',
+              background: 'var(--gothic-espresso)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 8px 20px rgba(230, 162, 60, 0.3)'
+              boxShadow: '0 8px 20px rgba(0, 0, 0, 0.35)'
             }}>
-              <FileText size={24} color="#FFFFFF" />
+              <FileText size={24} color="var(--gothic-light)" />
             </div>
             <div>
               <div style={{
@@ -479,7 +479,7 @@ export default function LoginModal({
         justifyContent: 'center',
         padding: '30px 24px',
         position: 'relative',
-        background: theme === 'dark' ? '#0F172A' : '#F7F9FA',
+        background: theme === 'dark' ? '#000000' : '#D1D0D0',
         overflowY: 'auto'
       }}>
 
