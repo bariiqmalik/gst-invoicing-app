@@ -12,6 +12,13 @@ import EmailModal from './components/EmailModal';
 import PaymentModal from './components/PaymentModal';
 import LoginModal from './components/LoginModal';
 import { api, getAuthToken, setAuthToken } from './services/api';
+import {
+  businessService,
+  customersService,
+  catalogService,
+  invoicesService,
+  setWorkspaceId
+} from './services/dbService';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -71,26 +78,41 @@ export default function App() {
   const [activeEmailInvoice, setActiveEmailInvoice] = useState(null);
   const [activePaymentInvoice, setActivePaymentInvoice] = useState(null);
 
-  // Fetch all core workspace data
-  const loadWorkspaceData = useCallback(async () => {
+  // Fetch all core workspace data from Supabase
+  const loadSupabaseData = useCallback(async (params = {}) => {
     try {
-      const [bizRes, custRes, catRes, invRes, dashRes] = await Promise.all([
-        api.getBusiness(),
-        api.getCustomers(),
-        api.getCatalog(),
-        api.getInvoices({ search: searchQuery, status: statusFilter, startDate, endDate }),
-        api.getDashboard()
+      const [bizRes, custRes, catRes, invRes] = await Promise.all([
+        businessService.getProfile(),
+        customersService.getCustomers(),
+        catalogService.getProducts(),
+        invoicesService.getInvoices({
+          search: params.search ?? searchQuery,
+          status: params.status ?? statusFilter,
+          startDate: params.startDate ?? startDate,
+          endDate: params.endDate ?? endDate
+        })
       ]);
 
-      if (bizRes.success) setBusiness(bizRes.business);
-      if (custRes.success) setCustomers(custRes.customers || []);
-      if (catRes.success) setCatalogItems(catRes.items || []);
-      if (invRes.success) setInvoices(invRes.invoices || []);
-      if (dashRes.success) setDashboardData(dashRes);
+      if (!bizRes.error && bizRes.data) setBusiness(bizRes.data);
+      if (!custRes.error) setCustomers(custRes.data || []);
+      if (!catRes.error) setCatalogItems(catRes.data || []);
+      if (!invRes.error) setInvoices(invRes.data || []);
     } catch (err) {
-      showToast(err.message || 'Unable to load workspace data from server.', 'error');
+      showToast(err.message || 'Unable to load workspace data from Supabase.', 'error');
     }
   }, [searchQuery, statusFilter, startDate, endDate, showToast]);
+
+  // Fetch dashboard analytics (still via Express backend)
+  const loadWorkspaceData = useCallback(async () => {
+    try {
+      const dashRes = await api.getDashboard();
+      if (dashRes.success) setDashboardData(dashRes);
+    } catch {
+      // Dashboard analytics are non-critical; silently swallow
+    }
+    // Reload Supabase data in parallel
+    await loadSupabaseData();
+  }, [loadSupabaseData]);
 
   // Check initial authentication
   useEffect(() => {
@@ -104,6 +126,8 @@ export default function App() {
         const res = await api.getMe();
         if (res.success && res.user) {
           setCurrentUser(res.user);
+          // Persist workspace_id so Supabase queries are scoped correctly
+          if (res.user.workspace_id) setWorkspaceId(res.user.workspace_id);
           await loadWorkspaceData();
         }
       } catch {
@@ -136,6 +160,7 @@ export default function App() {
       if (res.success && res.token) {
         setAuthToken(res.token);
         setCurrentUser(res.user);
+        if (res.user?.workspace_id) setWorkspaceId(res.user.workspace_id);
         await loadWorkspaceData();
         showToast(`Welcome back, ${res.user?.name || 'Owner'}!`, 'success');
         return res;
@@ -153,6 +178,7 @@ export default function App() {
       if (res.success && res.token) {
         setAuthToken(res.token);
         setCurrentUser(res.user);
+        if (res.user?.workspace_id) setWorkspaceId(res.user.workspace_id);
         await loadWorkspaceData();
         showToast('Business workspace registered successfully!', 'success');
         return res;
@@ -170,6 +196,7 @@ export default function App() {
       if (res.success && res.token) {
         setAuthToken(res.token);
         setCurrentUser(res.user);
+        if (res.user?.workspace_id) setWorkspaceId(res.user.workspace_id);
         await loadWorkspaceData();
         const providerName = payload.provider?.toLowerCase() === 'google' ? 'Google' : 'Apple';
         showToast(`Authenticated securely via ${providerName} SSO!`, 'success');
@@ -188,6 +215,7 @@ export default function App() {
       if (res.success && res.token) {
         setAuthToken(res.token);
         setCurrentUser(res.user);
+        if (res.user?.workspace_id) setWorkspaceId(res.user.workspace_id);
         await loadWorkspaceData();
         showToast('Authenticated via Biometric Passkey / Touch ID!', 'success');
         return res;
@@ -201,20 +229,20 @@ export default function App() {
 
   const handleLogout = () => {
     setAuthToken('');
+    setWorkspaceId(null);
     setCurrentUser(null);
     showToast('Logged out of GST workspace.', 'info');
   };
 
-  // Invoice Handlers
+  // Invoice Handlers — persist to Supabase
   const handleSaveInvoice = async (invoicePayload) => {
     try {
-      const res = await api.createInvoice(invoicePayload);
-      if (res.success) {
-        setIsCreateInvoiceOpen(false);
-        await loadWorkspaceData();
-        setActivePreviewInvoice(res.invoice);
-        showToast(`Invoice #${res.invoice?.invoiceNumber || ''} created successfully!`, 'success');
-      }
+      const { data, error } = await invoicesService.createInvoice(invoicePayload);
+      if (error) throw new Error(error.message);
+      setIsCreateInvoiceOpen(false);
+      await loadSupabaseData();
+      if (data) setActivePreviewInvoice(data);
+      showToast(`Invoice #${data?.invoiceNumber || ''} created and saved to Supabase!`, 'success');
     } catch (err) {
       showToast(err.message || 'Failed to create invoice.', 'error');
     }
@@ -223,8 +251,9 @@ export default function App() {
   const handleDeleteInvoice = async (id) => {
     if (!window.confirm('Are you sure you want to delete this invoice? This action cannot be undone.')) return;
     try {
-      await api.deleteInvoice(id);
-      await loadWorkspaceData();
+      const { error } = await invoicesService.deleteInvoice(id);
+      if (error) throw new Error(error.message);
+      await loadSupabaseData();
       showToast('Invoice deleted successfully.', 'info');
     } catch (err) {
       showToast(err.message || 'Failed to delete invoice.', 'error');
@@ -233,31 +262,36 @@ export default function App() {
 
   const handleRecordPayment = async (invoiceId, paymentData) => {
     try {
-      const res = await api.recordPayment(invoiceId, paymentData);
-      if (res.success) {
-        await loadWorkspaceData();
-        if (activePreviewInvoice && activePreviewInvoice.id === invoiceId) {
-          setActivePreviewInvoice(res.invoice);
-        }
-        showToast('Payment recorded successfully!', 'success');
+      const { data, error } = await invoicesService.updateInvoiceStatus(invoiceId, {
+        status: 'Paid',
+        paymentDetails: paymentData
+      });
+      if (error) throw new Error(error.message);
+      await loadSupabaseData();
+      if (activePreviewInvoice && activePreviewInvoice.id === invoiceId) {
+        setActivePreviewInvoice(data);
       }
+      showToast('Payment recorded successfully!', 'success');
     } catch (err) {
       showToast(err.message || 'Failed to record payment.', 'error');
     }
   };
 
-  // Customer Handlers
+  // Customer Handlers — persist to Supabase
   const handleSaveCustomer = async (customerData, id = null) => {
     try {
+      let result;
       if (id) {
-        await api.updateCustomer(id, customerData);
+        result = await customersService.updateCustomer(id, customerData);
+        if (result.error) throw new Error(result.error.message);
         showToast('Customer profile updated.', 'success');
       } else {
-        await api.createCustomer(customerData);
+        result = await customersService.addCustomer(customerData);
+        if (result.error) throw new Error(result.error.message);
         showToast('Customer added to directory.', 'success');
       }
-      const custRes = await api.getCustomers();
-      if (custRes.success) setCustomers(custRes.customers);
+      const { data: updated } = await customersService.getCustomers();
+      setCustomers(updated || []);
     } catch (err) {
       showToast(err.message || 'Failed to save customer.', 'error');
     }
@@ -266,27 +300,31 @@ export default function App() {
   const handleDeleteCustomer = async (id) => {
     if (!window.confirm('Delete this customer from the directory?')) return;
     try {
-      await api.deleteCustomer(id);
-      const custRes = await api.getCustomers();
-      if (custRes.success) setCustomers(custRes.customers);
+      const { error } = await customersService.deleteCustomer(id);
+      if (error) throw new Error(error.message);
+      const { data: updated } = await customersService.getCustomers();
+      setCustomers(updated || []);
       showToast('Customer removed from directory.', 'info');
     } catch (err) {
       showToast(err.message || 'Failed to delete customer.', 'error');
     }
   };
 
-  // Catalog Item Handlers
+  // Catalog Item Handlers — persist to Supabase
   const handleSaveCatalogItem = async (itemData, id = null) => {
     try {
+      let result;
       if (id) {
-        await api.updateCatalogItem(id, itemData);
+        result = await catalogService.updateProduct(id, itemData);
+        if (result.error) throw new Error(result.error.message);
         showToast('Catalog item updated.', 'success');
       } else {
-        await api.createCatalogItem(itemData);
+        result = await catalogService.addProduct(itemData);
+        if (result.error) throw new Error(result.error.message);
         showToast('Catalog item created.', 'success');
       }
-      const catRes = await api.getCatalog();
-      if (catRes.success) setCatalogItems(catRes.items);
+      const { data: updated } = await catalogService.getProducts();
+      setCatalogItems(updated || []);
     } catch (err) {
       showToast(err.message || 'Failed to save catalog item.', 'error');
     }
@@ -295,23 +333,23 @@ export default function App() {
   const handleDeleteCatalogItem = async (id) => {
     if (!window.confirm('Delete this item from the catalog?')) return;
     try {
-      await api.deleteCatalogItem(id);
-      const catRes = await api.getCatalog();
-      if (catRes.success) setCatalogItems(catRes.items);
+      const { error } = await catalogService.deleteProduct(id);
+      if (error) throw new Error(error.message);
+      const { data: updated } = await catalogService.getProducts();
+      setCatalogItems(updated || []);
       showToast('Item deleted from catalog.', 'info');
     } catch (err) {
       showToast(err.message || 'Failed to delete item.', 'error');
     }
   };
 
-  // Business Profile Handlers
+  // Business Profile Handlers — persist to Supabase
   const handleSaveBusiness = async (bizData) => {
     try {
-      const res = await api.updateBusiness(bizData);
-      if (res.success) {
-        setBusiness(res.business);
-        showToast('Business GST profile saved successfully.', 'success');
-      }
+      const { data, error } = await businessService.updateProfile(bizData);
+      if (error) throw new Error(error.message);
+      if (data) setBusiness(data);
+      showToast('Business GST profile saved to Supabase successfully.', 'success');
     } catch (err) {
       showToast(err.message || 'Failed to save business settings.', 'error');
     }
