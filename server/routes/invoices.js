@@ -1,7 +1,12 @@
 import express from 'express';
 import { db } from '../models/index.js';
 import { authenticateToken } from './auth.js';
-import { validateGSTIN, validateHsnSac, numberToIndianWords } from '../utils/gstUtils.js';
+import { 
+  validateCustomerGSTIN,
+  validateHsnSac, 
+  numberToIndianWords,
+  isIntraStateSupply 
+} from '../utils/gstUtils.js';
 
 const router = express.Router();
 
@@ -9,7 +14,7 @@ const router = express.Router();
  * Helper to calculate line items and invoice totals according to Indian GST rules
  */
 export function calculateGstInvoice(items, businessStateCode, posStateCode, reverseCharge = false) {
-  const isInterState = businessStateCode !== posStateCode;
+  const isInterState = !isIntraStateSupply(businessStateCode, posStateCode);
 
   let totalTaxableAmount = 0;
   let totalCgstAmount = 0;
@@ -33,15 +38,25 @@ export function calculateGstInvoice(items, businessStateCode, posStateCode, reve
     let igstRate = 0;
     let igstAmount = 0;
 
-    if (!reverseCharge) {
-      if (isInterState) {
-        igstRate = gstRate;
+    if (isInterState) {
+      // Inter-state supply: Apply full IGST
+      igstRate = gstRate;
+      cgstRate = 0;
+      sgstRate = 0;
+      if (!reverseCharge) {
         igstAmount = Math.round((taxableAmount * (igstRate / 100)) * 100) / 100;
-      } else {
-        cgstRate = gstRate / 2;
+        cgstAmount = 0;
+        sgstAmount = 0;
+      }
+    } else {
+      // Intra-state supply: Split tax evenly between CGST and SGST
+      cgstRate = gstRate / 2;
+      sgstRate = gstRate / 2;
+      igstRate = 0;
+      if (!reverseCharge) {
         cgstAmount = Math.round((taxableAmount * (cgstRate / 100)) * 100) / 100;
-        sgstRate = gstRate / 2;
         sgstAmount = Math.round((taxableAmount * (sgstRate / 100)) * 100) / 100;
+        igstAmount = 0;
       }
     }
 
@@ -177,7 +192,7 @@ router.post('/', authenticateToken, async (req, res) => {
 
     // Validate Customer GSTIN if present
     if (customerDetails.gstin && customerDetails.gstin.trim()) {
-      const gstinVal = validateGSTIN(customerDetails.gstin, placeOfSupplyStateCode);
+      const gstinVal = validateCustomerGSTIN(customerDetails.gstin, placeOfSupplyStateCode);
       if (!gstinVal.valid) {
         return res.status(400).json({ 
           success: false, 
@@ -292,7 +307,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
 
     // Validate customer GSTIN
     if (customerDetails?.gstin && customerDetails.gstin.trim()) {
-      const gstinVal = validateGSTIN(customerDetails.gstin, targetPos);
+      const gstinVal = validateCustomerGSTIN(customerDetails.gstin, targetPos);
       if (!gstinVal.valid) {
         return res.status(400).json({ 
           success: false, 

@@ -39,38 +39,92 @@ export const GST_STATES = [
   { code: '97', name: 'Other Territory' }
 ];
 
-export const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+export const CUSTOMER_GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+export const GSTIN_REGEX = CUSTOMER_GSTIN_REGEX;
 export const HSN_REGEX = /^[0-9]{4}([0-9]{2})?([0-9]{2})?$/; // 4, 6, or 8 digits
 export const SAC_REGEX = /^99[0-9]{4}$/; // SAC 6 digits starting with 99
 
 /**
- * Validate GSTIN with graceful sanitization (strips spaces and hyphens)
+ * Normalizes or extracts a 2-digit GST state code from a code, state name, or GSTIN
  */
-export function validateGSTIN(gstin, expectedStateCode = null) {
-  if (!gstin) return { valid: false, error: 'GSTIN is empty' };
+export function resolveStateCode(input) {
+  if (!input && input !== 0) return '';
+  const str = String(input).trim();
+  if (!str) return '';
+
+  // 1 or 2 digits
+  if (/^[0-9]{1,2}$/.test(str)) {
+    return str.padStart(2, '0');
+  }
+
+  // 15-char GSTIN (first 2 digits are state code)
+  if (CUSTOMER_GSTIN_REGEX.test(str) || (str.length === 15 && /^[0-9]{2}/.test(str))) {
+    return str.substring(0, 2);
+  }
+
+  // Lookup in GST_STATES by code or name
+  const match = GST_STATES.find(s => 
+    s.code === str || 
+    s.code === str.padStart(2, '0') || 
+    s.name.toLowerCase() === str.toLowerCase()
+  );
+  return match ? match.code : str;
+}
+
+/**
+ * Determines whether supply is intra-state (true) or inter-state (false)
+ * Supply is intra-state when supplier state code matches customer / POS state code
+ */
+export function isIntraStateSupply(supplierStateCode, customerStateCode) {
+  const sCode = resolveStateCode(supplierStateCode);
+  const cCode = resolveStateCode(customerStateCode);
+  return Boolean(sCode && cCode && sCode === cCode);
+}
+
+/**
+ * Standard regex validator for customer GSTINs.
+ * Tests if the given string strictly matches the standard Indian GSTIN regex:
+ * ^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$
+ * @param {string} gstin 
+ * @returns {boolean}
+ */
+export function isValidCustomerGSTIN(gstin) {
+  if (!gstin || typeof gstin !== 'string') return false;
+  const cleaned = gstin.trim().replace(/[\s-]/g, '').toUpperCase();
+  return CUSTOMER_GSTIN_REGEX.test(cleaned);
+}
+
+/**
+ * Validates a customer GSTIN with detailed error messaging and optional state code verification.
+ */
+export function validateCustomerGSTIN(gstin, expectedStateCode = null) {
+  if (!gstin) return { valid: false, error: 'Customer GSTIN cannot be empty' };
   const cleaned = gstin.toString().trim().replace(/[\s-]/g, '').toUpperCase();
   if (cleaned.length !== 15) {
     return { 
       valid: false, 
-      error: `GSTIN must be exactly 15 characters (currently ${cleaned.length} chars). Example: 27AABCV1234F1Z8` 
+      error: `Customer GSTIN must be exactly 15 characters (currently ${cleaned.length} chars). Example: 29AABCT1334M1ZV` 
     };
   }
-  if (!GSTIN_REGEX.test(cleaned)) {
+  if (!CUSTOMER_GSTIN_REGEX.test(cleaned)) {
     return { 
       valid: false, 
-      error: 'Invalid GSTIN structure. Expected: 2 digits (state) + 5 letters (PAN) + 4 digits + 1 letter + 1 char + Z + 1 check char' 
+      error: 'Invalid customer GSTIN structure. Expected format: 2 digits (state) + 5 letters (PAN) + 4 digits + 1 letter + 1 entity char + Z + 1 check char' 
     };
   }
   const stateCode = cleaned.substring(0, 2);
   const state = GST_STATES.find(s => s.code === stateCode);
   if (!state) {
-    return { valid: false, error: `Invalid GST state code '${stateCode}' in GSTIN` };
+    return { valid: false, error: `Invalid GST state code '${stateCode}' in customer GSTIN` };
   }
-  if (expectedStateCode && expectedStateCode !== stateCode) {
-    return { 
-      valid: false, 
-      error: `GSTIN state code (${stateCode} - ${state.name}) does not match selected Place of Supply (${expectedStateCode})` 
-    };
+  if (expectedStateCode) {
+    const normExpected = resolveStateCode(expectedStateCode);
+    if (normExpected && normExpected !== stateCode) {
+      return { 
+        valid: false, 
+        error: `Customer GSTIN state code (${stateCode} - ${state.name}) does not match Place of Supply (${normExpected})` 
+      };
+    }
   }
   return { 
     valid: true, 
@@ -79,6 +133,13 @@ export function validateGSTIN(gstin, expectedStateCode = null) {
     stateName: state.name, 
     pan: cleaned.substring(2, 12) 
   };
+}
+
+/**
+ * Backward-compatible alias for validateCustomerGSTIN
+ */
+export function validateGSTIN(gstin, expectedStateCode = null) {
+  return validateCustomerGSTIN(gstin, expectedStateCode);
 }
 
 /**
@@ -191,7 +252,7 @@ export function numberToIndianWords(num) {
  * Real-time calculation of invoice line items and totals
  */
 export function calculateInvoiceTotals(items, businessStateCode, posStateCode, reverseCharge = false) {
-  const isInterState = String(businessStateCode) !== String(posStateCode);
+  const isInterState = !isIntraStateSupply(businessStateCode, posStateCode);
 
   let totalTaxableAmount = 0;
   let totalCgstAmount = 0;
@@ -215,15 +276,25 @@ export function calculateInvoiceTotals(items, businessStateCode, posStateCode, r
     let igstRate = 0;
     let igstAmount = 0;
 
-    if (!reverseCharge) {
-      if (isInterState) {
-        igstRate = gstRate;
+    if (isInterState) {
+      // Inter-state supply: Apply full IGST
+      igstRate = gstRate;
+      cgstRate = 0;
+      sgstRate = 0;
+      if (!reverseCharge) {
         igstAmount = Math.round((taxableAmount * (igstRate / 100)) * 100) / 100;
-      } else {
-        cgstRate = gstRate / 2;
+        cgstAmount = 0;
+        sgstAmount = 0;
+      }
+    } else {
+      // Intra-state supply: Split tax evenly between CGST and SGST
+      cgstRate = gstRate / 2;
+      sgstRate = gstRate / 2;
+      igstRate = 0;
+      if (!reverseCharge) {
         cgstAmount = Math.round((taxableAmount * (cgstRate / 100)) * 100) / 100;
-        sgstRate = gstRate / 2;
         sgstAmount = Math.round((taxableAmount * (sgstRate / 100)) * 100) / 100;
+        igstAmount = 0;
       }
     }
 

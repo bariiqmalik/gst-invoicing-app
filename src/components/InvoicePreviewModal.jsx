@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-import { formatINR } from '../utils/gstFrontendUtils';
+import { formatINR, isIntraStateSupply } from '../utils/gstFrontendUtils';
 
 export default function InvoicePreviewModal({
   isOpen,
@@ -29,7 +29,9 @@ export default function InvoicePreviewModal({
   // Early return only AFTER hooks
   if (!isOpen || !invoice) return null;
 
-  const isInterState = invoice.isInterState;
+  const isInterState = invoice.isInterState !== undefined 
+    ? Boolean(invoice.isInterState) 
+    : (Number(invoice.totalIgstAmount) > 0 || !isIntraStateSupply(business?.stateCode || invoice.businessDetails?.stateCode || '27', invoice.placeOfSupplyStateCode || invoice.customerDetails?.stateCode));
   const isPaid = invoice.status === 'Paid';
   const isOverdue = invoice.status === 'Overdue';
 

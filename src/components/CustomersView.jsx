@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { Plus, Search, Edit2, Trash2, FilePlus } from 'lucide-react';
-import { GST_STATES, validateGSTIN } from '../utils/gstFrontendUtils';
+import { 
+  GST_STATES, 
+  validateCustomerGSTIN, 
+  resolveStateCode 
+} from '../utils/gstFrontendUtils';
 
 export default function CustomersView({
   customers = [],
@@ -71,7 +75,7 @@ export default function CustomersView({
     
     // Auto-sync state dropdown if user typed or pasted valid 2-digit state prefix
     if (stripped.length >= 2) {
-      const code = stripped.substring(0, 2);
+      const code = resolveStateCode(stripped.substring(0, 2));
       const stateObj = GST_STATES.find(s => s.code === code);
       if (stateObj && stateCode !== code) {
         setStateCode(code);
@@ -79,7 +83,7 @@ export default function CustomersView({
     }
 
     if (stripped.length > 0) {
-      const res = validateGSTIN(stripped, stateCode);
+      const res = validateCustomerGSTIN(stripped, stateCode);
       if (!res.valid) {
         setGstinError(res.error);
       } else {
@@ -95,7 +99,7 @@ export default function CustomersView({
 
     const cleanedGstin = gstin.trim().replace(/[\s-]/g, '').toUpperCase();
     if (cleanedGstin) {
-      const res = validateGSTIN(cleanedGstin, stateCode);
+      const res = validateCustomerGSTIN(cleanedGstin, stateCode);
       if (!res.valid) {
         setGstinError(res.error);
         return;

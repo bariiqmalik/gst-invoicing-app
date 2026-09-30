@@ -9,7 +9,9 @@ import {
 } from 'lucide-react';
 import { 
   GST_STATES, 
-  validateGSTIN, 
+  validateCustomerGSTIN,
+  isValidCustomerGSTIN,
+  resolveStateCode,
   validateHsnSac, 
   calculateInvoiceTotals, 
   formatINR 
@@ -78,22 +80,40 @@ export default function InvoiceEditorModal({
     if (c) {
       setCustomerName(c.name || '');
       setCompanyName(c.companyName || '');
-      setCustomerGstin(c.gstin || '');
+      const custGstin = (c.gstin || '').toUpperCase().trim();
+      setCustomerGstin(custGstin);
       setCustomerEmail(c.email || '');
       setCustomerPhone(c.phone || '');
       const addr = [c.billingAddress?.street, c.billingAddress?.city].filter(Boolean).join(', ');
       setCustomerAddress(addr);
 
-      if (c.billingAddress?.state && c.billingAddress?.stateCode) {
-        setPlaceOfSupply(c.billingAddress.state);
-        setPlaceOfSupplyStateCode(c.billingAddress.stateCode);
+      // Auto-set place of supply based on customer address or GSTIN prefix
+      let custStateCode = c.billingAddress?.stateCode;
+      if (!custStateCode && custGstin.length >= 2) {
+        custStateCode = custGstin.substring(0, 2);
+      }
+
+      if (custStateCode) {
+        const normCode = resolveStateCode(custStateCode);
+        const st = GST_STATES.find(s => s.code === normCode);
+        if (st) {
+          setPlaceOfSupply(st.name);
+          setPlaceOfSupplyStateCode(st.code);
+        }
+      } else if (c.billingAddress?.state) {
+        const st = GST_STATES.find(s => s.name.toLowerCase() === c.billingAddress.state.toLowerCase());
+        if (st) {
+          setPlaceOfSupply(st.name);
+          setPlaceOfSupplyStateCode(st.code);
+        }
       }
     }
   };
 
   // Place of supply change
   const handlePosChange = (code) => {
-    const st = GST_STATES.find(s => s.code === code);
+    const normCode = resolveStateCode(code);
+    const st = GST_STATES.find(s => s.code === normCode);
     if (st) {
       setPlaceOfSupply(st.name);
       setPlaceOfSupplyStateCode(st.code);
@@ -106,7 +126,7 @@ export default function InvoiceEditorModal({
     setCustomerGstin(cleaned);
     const stripped = cleaned.replace(/[\s-]/g, '');
     if (stripped.length >= 2) {
-      const code = stripped.substring(0, 2);
+      const code = resolveStateCode(stripped.substring(0, 2));
       const stateObj = GST_STATES.find(s => s.code === code);
       if (stateObj && placeOfSupplyStateCode !== code) {
         setPlaceOfSupply(stateObj.name);
@@ -187,7 +207,7 @@ export default function InvoiceEditorModal({
 
     // Validate Customer GSTIN if provided
     if (customerGstin.trim()) {
-      const gstinVal = validateGSTIN(customerGstin, placeOfSupplyStateCode);
+      const gstinVal = validateCustomerGSTIN(customerGstin, placeOfSupplyStateCode);
       if (!gstinVal.valid) {
         errors.push(`Customer GSTIN Error: ${gstinVal.error}`);
       }
@@ -401,18 +421,31 @@ export default function InvoiceEditorModal({
                 </div>
 
                 <div>
-                  <label className="form-label">
+                  <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>Customer GSTIN (B2B)</span>
                     <span className="form-hint">15 chars</span>
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className={`form-control ${customerGstin.trim() && !isValidCustomerGSTIN(customerGstin) ? 'is-invalid' : ''}`}
                     placeholder="e.g. 29AABCT1334M1ZV"
                     value={customerGstin}
                     onChange={(e) => handleGstinInputChange(e.target.value)}
                     style={{ fontFamily: 'monospace' }}
                   />
+                  {customerGstin.trim() && (
+                    <div style={{ marginTop: '4px', fontSize: '11px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      {isValidCustomerGSTIN(customerGstin) ? (
+                        <span style={{ color: 'var(--secondary)', fontWeight: 600 }}>✓ Valid GSTIN ({placeOfSupply})</span>
+                      ) : (
+                        <span style={{ color: 'var(--danger)', fontWeight: 500 }}>
+                          {customerGstin.replace(/[\s-]/g, '').length !== 15 
+                            ? `Must be 15 chars (${customerGstin.replace(/[\s-]/g, '').length}/15)` 
+                            : 'Invalid format: expected 2 digits + 10-char PAN + 1 entity + Z + 1 check'}
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <div>

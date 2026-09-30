@@ -40,43 +40,96 @@ export const GST_STATES = [
   { code: '97', name: 'Other Territory' }
 ];
 
-export const GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+export const CUSTOMER_GSTIN_REGEX = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+export const GSTIN_REGEX = CUSTOMER_GSTIN_REGEX;
 export const HSN_REGEX = /^[0-9]{4}([0-9]{2})?([0-9]{2})?$/; // 4, 6, or 8 digits
 export const SAC_REGEX = /^99[0-9]{4}$/; // SAC codes always start with 99 and have 6 digits
 
 /**
- * Validate GSTIN structure and optionally verify state code match
+ * Normalizes or extracts a 2-digit GST state code from a code, state name, or GSTIN
  */
-export function validateGSTIN(gstin, expectedStateCode = null) {
-  if (!gstin) return { valid: false, error: 'GSTIN cannot be empty' };
+export function resolveStateCode(input) {
+  if (!input && input !== 0) return '';
+  const str = String(input).trim();
+  if (!str) return '';
+
+  if (/^[0-9]{1,2}$/.test(str)) {
+    return str.padStart(2, '0');
+  }
+
+  if (CUSTOMER_GSTIN_REGEX.test(str) || (str.length === 15 && /^[0-9]{2}/.test(str))) {
+    return str.substring(0, 2);
+  }
+
+  const match = GST_STATES.find(s => 
+    s.code === str || 
+    s.code === str.padStart(2, '0') || 
+    s.name.toLowerCase() === str.toLowerCase()
+  );
+  return match ? match.code : str;
+}
+
+/**
+ * Determines whether supply is intra-state (true) or inter-state (false)
+ * Supply is intra-state when supplier state code matches customer / POS state code
+ */
+export function isIntraStateSupply(supplierStateCode, customerStateCode) {
+  const sCode = resolveStateCode(supplierStateCode);
+  const cCode = resolveStateCode(customerStateCode);
+  return Boolean(sCode && cCode && sCode === cCode);
+}
+
+/**
+ * Standard regex validator for customer GSTINs.
+ * Tests if the given string strictly matches the standard Indian GSTIN regex:
+ * ^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$
+ */
+export function isValidCustomerGSTIN(gstin) {
+  if (!gstin || typeof gstin !== 'string') return false;
+  const cleaned = gstin.trim().replace(/[\s-]/g, '').toUpperCase();
+  return CUSTOMER_GSTIN_REGEX.test(cleaned);
+}
+
+/**
+ * Validate customer GSTIN structure and optionally verify state code match
+ */
+export function validateCustomerGSTIN(gstin, expectedStateCode = null) {
+  if (!gstin) return { valid: false, error: 'Customer GSTIN cannot be empty' };
   const cleaned = gstin.toString().trim().replace(/[\s-]/g, '').toUpperCase();
   if (cleaned.length !== 15) {
     return { 
       valid: false, 
-      error: `GSTIN must be exactly 15 characters (currently ${cleaned.length} chars). Example: 27AABCV1234F1Z8` 
+      error: `Customer GSTIN must be exactly 15 characters (currently ${cleaned.length} chars). Example: 29AABCT1334M1ZV` 
     };
   }
-  if (!GSTIN_REGEX.test(cleaned)) {
+  if (!CUSTOMER_GSTIN_REGEX.test(cleaned)) {
     return { 
       valid: false, 
-      error: 'Invalid GSTIN structure. Expected format: 2 digits (state) + 5 letters (PAN) + 4 digits + 1 letter + 1 char + Z + 1 check char' 
+      error: 'Invalid customer GSTIN structure. Expected format: 2 digits (state) + 5 letters (PAN) + 4 digits + 1 letter + 1 entity code + Z + 1 check char' 
     };
   }
 
   const stateCode = cleaned.substring(0, 2);
   const state = GST_STATES.find(s => s.code === stateCode);
   if (!state) {
-    return { valid: false, error: `Invalid GST state code '${stateCode}' in GSTIN` };
+    return { valid: false, error: `Invalid GST state code '${stateCode}' in customer GSTIN` };
   }
 
-  if (expectedStateCode && String(expectedStateCode) !== String(stateCode)) {
-    return { 
-      valid: false, 
-      error: `GSTIN state code (${stateCode} - ${state.name}) does not match selected Place of Supply (${expectedStateCode})` 
-    };
+  if (expectedStateCode) {
+    const normExpected = resolveStateCode(expectedStateCode);
+    if (normExpected && normExpected !== stateCode) {
+      return { 
+        valid: false, 
+        error: `Customer GSTIN state code (${stateCode} - ${state.name}) does not match selected Place of Supply (${normExpected})` 
+      };
+    }
   }
 
   return { valid: true, code: cleaned, stateCode, stateName: state.name, pan: cleaned.substring(2, 12) };
+}
+
+export function validateGSTIN(gstin, expectedStateCode = null) {
+  return validateCustomerGSTIN(gstin, expectedStateCode);
 }
 
 /**
