@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { QRCodeSVG } from 'qrcode.react';
 import { formatINR, isIntraStateSupply, numberToIndianWords } from '../utils/gstFrontendUtils';
 
 export default function InvoicePreviewModal({
@@ -526,31 +527,88 @@ export default function InvoicePreviewModal({
                   </div>
                 </div>
 
-                {/* Bank details */}
+                {/* Bank details + UPI QR Code */}
                 <div style={{ border: '1px dashed var(--border)', borderRadius: '6px', padding: '12px 14px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, color: 'var(--primary)', marginBottom: '6px' }} className="print-primary-color">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 700, color: 'var(--primary)', marginBottom: '8px' }} className="print-primary-color">
                     <CreditCard size={14} />
                     <span>Bank &amp; Remittance Details</span>
                   </div>
-                  <div style={{ color: 'var(--text)', lineHeight: 1.6, fontSize: '11px' }}>
-                    <div><strong>Bank Name:</strong>&nbsp;{business?.bankDetails?.bankName || 'N/A'}</div>
-                    <div><strong>Account Holder:</strong>&nbsp;{business?.bankDetails?.accountHolder || business?.legalName || 'N/A'}</div>
-                    <div>
-                      <strong>A/C No:</strong>&nbsp;
-                      <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{business?.bankDetails?.accountNumber || 'N/A'}</span>
-                    </div>
-                    <div>
-                      <strong>IFSC:</strong>&nbsp;
-                      <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{business?.bankDetails?.ifscCode || 'N/A'}</span>
-                      &nbsp;&nbsp;
-                      <strong>Branch:</strong>&nbsp;{business?.bankDetails?.branch || 'N/A'}
-                    </div>
-                    {business?.bankDetails?.upiId && (
-                      <div style={{ marginTop: '4px', color: 'var(--secondary)', fontWeight: 600 }}>
-                        UPI VPA:&nbsp;
-                        <span style={{ fontFamily: 'monospace' }}>{business.bankDetails.upiId}</span>
+
+                  {/* Two-column: bank text left, QR right */}
+                  <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+
+                    {/* Bank text fields */}
+                    <div style={{ flex: 1, color: 'var(--text)', lineHeight: 1.65, fontSize: '11px' }}>
+                      <div><strong>Bank Name:</strong>&nbsp;{business?.bankDetails?.bankName || 'N/A'}</div>
+                      <div><strong>Account Holder:</strong>&nbsp;{business?.bankDetails?.accountHolder || business?.legalName || 'N/A'}</div>
+                      <div>
+                        <strong>A/C No:</strong>&nbsp;
+                        <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{business?.bankDetails?.accountNumber || 'N/A'}</span>
                       </div>
-                    )}
+                      <div>
+                        <strong>IFSC:</strong>&nbsp;
+                        <span style={{ fontFamily: 'monospace', fontWeight: 700 }}>{business?.bankDetails?.ifscCode || 'N/A'}</span>
+                        &nbsp;&nbsp;
+                        <strong>Branch:</strong>&nbsp;{business?.bankDetails?.branch || 'N/A'}
+                      </div>
+                      {business?.bankDetails?.upiId && (
+                        <div style={{ marginTop: '4px', color: 'var(--secondary)', fontWeight: 600 }}>
+                          UPI VPA:&nbsp;
+                          <span style={{ fontFamily: 'monospace' }}>{business.bankDetails.upiId}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* UPI QR Code — only rendered when UPI ID is configured */}
+                    {business?.bankDetails?.upiId && (() => {
+                      const upiUri = `upi://pay?pa=${encodeURIComponent(business.bankDetails.upiId)}&pn=${encodeURIComponent(business.legalName || business.tradeName || 'Merchant')}&am=${Number(invoice.grandTotal || 0).toFixed(2)}&cu=INR&tn=${encodeURIComponent('Invoice ' + (invoice.invoiceNumber || ''))}`;
+                      return (
+                        <div style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          gap: '6px',
+                          flexShrink: 0
+                        }}>
+                          {/* SVG QR — vector, prints at full DPI */}
+                          <div style={{
+                            padding: '6px',
+                            background: '#ffffff',
+                            border: '1.5px solid var(--border)',
+                            borderRadius: '6px',
+                            lineHeight: 0
+                          }}>
+                            <QRCodeSVG
+                              value={upiUri}
+                              size={96}
+                              level="M"
+                              includeMargin={false}
+                              style={{ display: 'block' }}
+                            />
+                          </div>
+                          <div style={{
+                            fontSize: '9px',
+                            fontWeight: 700,
+                            color: 'var(--primary)',
+                            textAlign: 'center',
+                            lineHeight: 1.3,
+                            maxWidth: '108px'
+                          }} className="print-primary-color">
+                            Scan to Pay via UPI
+                          </div>
+                          <div style={{
+                            fontSize: '8.5px',
+                            color: 'var(--muted-text)',
+                            textAlign: 'center',
+                            lineHeight: 1.25,
+                            maxWidth: '108px'
+                          }}>
+                            GPay · PhonePe · Paytm
+                          </div>
+                        </div>
+                      );
+                    })()}
+
                   </div>
                 </div>
               </div>
