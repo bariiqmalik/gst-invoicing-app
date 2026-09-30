@@ -15,53 +15,53 @@
   --kiwi-yellow: #FFFF00;   /* Tertiary / focus rings               */
   --kiwi-black:  #000000;   /* Text on lime / icon fills            */
 
-  /* ── Light mode surfaces ── */
-  --primary:        #1A1A1A;   /* Headlines, nav brand                */
-  --secondary:      #CCFF00;   /* CTAs, active states                 */
-  --accent:         #DFFF00;   /* Hover, secondary actions            */
-  --background:     #F8FFEA;   /* Faint lime-tinted canvas            */
-  --cards:          #FFFFFF;   /* Card / modal surfaces               */
-  --text:           #111111;   /* Body copy                           */
-  --muted-text:     #555555;   /* Labels, captions                    */
-  --border:         #D6F0A0;   /* Lime-tinted borders                 */
+  /* ── Light mode surfaces — clean canvas, lime as accent only ── */
+  --primary:        #111111;   /* Headlines, primary text              */
+  --secondary:      #CCFF00;   /* CTAs, active states, chart bars      */
+  --accent:         #DFFF00;   /* Hover actions, secondary highlights  */
+  --background:     #F5F5F5;   /* Clean near-white — NO lime tint      */
+  --cards:          #FFFFFF;   /* Pure white card / modal surfaces     */
+  --text:           #111111;   /* Body copy                            */
+  --muted-text:     #6B7280;   /* Captions, secondary labels           */
+  --border:         #E4E4E4;   /* Neutral grey border                  */
 
   /* Semantic Aliases */
   --bg-main:     var(--background);
   --bg-card:     var(--cards);
-  --bg-subtle:   #EFF9D0;       /* Slightly deeper lime tint           */
-  --bg-hover:    #E5F5BC;       /* Hover surface                       */
+  --bg-subtle:   #F0F0F0;       /* Slightly grey — tabs, table headers  */
+  --bg-hover:    #E8FDB0;       /* Lime blush appears ONLY on hover     */
   --text-primary: var(--text);
   --text-muted:  var(--muted-text);
-  --text-light:  #888888;
+  --text-light:  #9CA3AF;
   --border-light: var(--border);
   --border-focus: var(--kiwi-lime);
 
   /* Primary Tonal Shades */
   --primary-dark:   #000000;
   --primary-light:  #333333;
-  --primary-subtle: #F0FFCC;   /* Very pale lime for badge fills      */
+  --primary-subtle: #F5FFD6;   /* Very pale lime for active badge bg   */
 
   /* Secondary (lime) Tonal Shades */
-  --secondary-dark:   #A8D400;   /* Darker lime for pressed states    */
-  --secondary-light:  #DFFF00;   /* Volt — lighter lime               */
-  --secondary-subtle: #EFFFB3;   /* Washout lime tint                 */
+  --secondary-dark:   #A8D400;
+  --secondary-light:  #DFFF00;
+  --secondary-subtle: #F2FFC4;   /* Washed lime for subtle pill fills   */
 
   /* Accent (volt) Tonal Shades */
   --accent-dark:   #B8CC00;
   --accent-light:  #FFFF00;
-  --accent-subtle: #FFFFB3;
+  --accent-subtle: #FFFFF0;
 
   /* ── Status Tokens ── */
-  --success:        #22C55E;
+  --success:        #16A34A;
   --success-light:  #DCFCE7;
   --success-border: #86EFAC;
-  --warning:        #CCFF00;     /* Lime doubles as warning — vivid   */
-  --warning-light:  #F0FFCC;
-  --warning-border: #C4E890;
-  --danger:         #EF4444;
+  --warning:        #D97706;
+  --warning-light:  #FEF3C7;
+  --warning-border: #FCD34D;
+  --danger:         #DC2626;
   --danger-light:   #FEE2E2;
   --danger-border:  #FECACA;
-  --info:           #3B82F6;
+  --info:           #2563EB;
   --info-light:     #EFF6FF;
   --info-border:    #BFDBFE;
 
@@ -90,11 +90,11 @@
   --radius-lg:  14px;
   --radius-xl:  20px;
 
-  /* Shadows — warm lime-tinted */
-  --shadow-sm: 0 1px 3px rgba(180, 220, 0, 0.08), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 14px rgba(180, 220, 0, 0.10), 0 2px 4px rgba(0,0,0,0.06);
-  --shadow-lg: 0 10px 28px rgba(180, 220, 0, 0.12), 0 4px 8px rgba(0,0,0,0.06);
-  --shadow-xl: 0 20px 40px rgba(180, 220, 0, 0.14), 0 8px 16px rgba(0,0,0,0.08);
+  /* Shadows — neutral, crisp */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.09), 0 2px 4px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 28px rgba(0,0,0,0.10), 0 4px 8px rgba(0,0,0,0.05);
+  --shadow-xl: 0 20px 40px rgba(0,0,0,0.12), 0 8px 16px rgba(0,0,0,0.06);
 
   /* Typography */
   --font-sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -404,7 +404,7 @@ button, input, select, textarea {
 }
 
 .badge-cancelled {
-  background-color: #F1F5F9;
+  background-color: var(--bg-subtle);
   color: var(--text-light);
   border: 1px solid var(--border);
 }
