@@ -506,6 +506,13 @@ export default function InvoicePreviewModal({
                   <span style={{ fontWeight: 600 }}>{formatINR(invoice.totalTaxAmount)}</span>
                 </div>
 
+                {invoice.roundOff !== undefined && invoice.roundOff !== 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '3px 0', fontSize: '11px', color: 'var(--muted-text)' }}>
+                    <span>Round-off ({Number(invoice.roundOff) > 0 ? '+' : ''}{Number(invoice.roundOff).toFixed(2)}):</span>
+                    <span>{Number(invoice.roundOff) > 0 ? '+' : ''}{formatINR(Math.abs(Number(invoice.roundOff)))}</span>
+                  </div>
+                )}
+
                 <div className="double-line-total" style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', marginTop: '6px' }}>
                   <span>TOTAL PAYABLE:</span>
                   <span>{formatINR(invoice.grandTotal)}</span>

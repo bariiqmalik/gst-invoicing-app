@@ -260,7 +260,18 @@ export default function InvoiceEditorModal({
       placeOfSupply,
       placeOfSupplyStateCode,
       reverseCharge,
-      items,
+      // Use processedItems from calculateInvoiceTotals — includes taxableAmount, cgstAmount, etc.
+      items: calculated.items,
+      // Computed GST totals
+      isInterState: calculated.isInterState,
+      totalTaxableAmount: calculated.totalTaxableAmount,
+      totalCgstAmount: calculated.totalCgstAmount,
+      totalSgstAmount: calculated.totalSgstAmount,
+      totalIgstAmount: calculated.totalIgstAmount,
+      totalTaxAmount: calculated.totalTaxAmount,
+      roundOff: calculated.roundOff,
+      grandTotal: calculated.grandTotal,
+      totalInWords: calculated.totalInWords,
       notes,
       termsAndConditions: terms,
       status: 'Sent'
@@ -794,6 +805,13 @@ export default function InvoiceEditorModal({
                   <span style={{ color: 'var(--muted-text)' }}>Total GST Amount:</span>
                   <span style={{ fontWeight: 600 }}>{formatINR(calculated.totalTaxAmount)}</span>
                 </div>
+
+                {calculated.roundOff !== 0 && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 0', fontSize: '12px', color: 'var(--muted-text)' }}>
+                    <span>Round-off ({calculated.roundOff > 0 ? '+' : ''}{calculated.roundOff.toFixed(2)}):</span>
+                    <span>{calculated.roundOff > 0 ? '+' : ''}{formatINR(Math.abs(calculated.roundOff))}</span>
+                  </div>
+                )}
 
                 <div style={{
                   display: 'flex',

@@ -328,7 +328,14 @@ export function calculateInvoiceTotals(items, businessStateCode, posStateCode, r
   totalSgstAmount = Math.round(totalSgstAmount * 100) / 100;
   totalIgstAmount = Math.round(totalIgstAmount * 100) / 100;
   const totalTaxAmount = Math.round((totalCgstAmount + totalSgstAmount + totalIgstAmount) * 100) / 100;
-  const grandTotal = Math.round((totalTaxableAmount + totalTaxAmount) * 100) / 100;
+  const exactGrandTotal = Math.round((totalTaxableAmount + totalTaxAmount) * 100) / 100;
+
+  // Round-off: difference between nearest integer rupee and exact grand total
+  // Positive = collected slightly more (rounding up), Negative = collected slightly less (rounding down)
+  const roundedGrandTotal = Math.round(exactGrandTotal);
+  const roundOff = Math.round((roundedGrandTotal - exactGrandTotal) * 100) / 100;
+  const grandTotal = roundedGrandTotal;
+
   const totalInWords = numberToIndianWords(grandTotal);
 
   return {
@@ -339,6 +346,7 @@ export function calculateInvoiceTotals(items, businessStateCode, posStateCode, r
     totalSgstAmount,
     totalIgstAmount,
     totalTaxAmount,
+    roundOff,
     grandTotal,
     totalInWords
   };
