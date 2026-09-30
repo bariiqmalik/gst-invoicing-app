@@ -1,161 +1,181 @@
+/* ══════════════════════════════════════════════════════════════
+   ELECTRIC KIWI — Design Token System
+   Palette: #CCFF00 (Lime) · #DFFF00 (Kiwi) · #FFFF00 (Volt)
+            #000000 (Black) · #0A0A0A (Near-Black)
+   Light Mode: Lime accents on white/cream canvas
+   Dark  Mode: Electric lime pops on pitch-black surfaces
+   ══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap');
+
 :root {
-  /* Exact User-Mandated Color Variables */
-  --primary: #123B5D;
-  --secondary: #167D7F;
-  --accent: #E6A23C;
-  --background: #F7F9FA;
-  --cards: #FFFFFF;
-  --text: #1F2933;
-  --muted-text: #6B7280;
-  --border: #DDE3E8;
+  /* ── Core Electric Kiwi brand palette ── */
+  --kiwi-lime:   #CCFF00;   /* Primary accent (buttons, highlights) */
+  --kiwi-volt:   #DFFF00;   /* Secondary accent (hover, glows)      */
+  --kiwi-yellow: #FFFF00;   /* Tertiary / focus rings               */
+  --kiwi-black:  #000000;   /* Text on lime / icon fills            */
 
-  /* Semantic Design System Mappings */
-  --bg-main: var(--background);
-  --bg-card: var(--cards);
-  --bg-subtle: #F0F4F8;
-  --bg-hover: #EBF1F6;
+  /* ── Light mode surfaces ── */
+  --primary:        #1A1A1A;   /* Headlines, nav brand                */
+  --secondary:      #CCFF00;   /* CTAs, active states                 */
+  --accent:         #DFFF00;   /* Hover, secondary actions            */
+  --background:     #F8FFEA;   /* Faint lime-tinted canvas            */
+  --cards:          #FFFFFF;   /* Card / modal surfaces               */
+  --text:           #111111;   /* Body copy                           */
+  --muted-text:     #555555;   /* Labels, captions                    */
+  --border:         #D6F0A0;   /* Lime-tinted borders                 */
+
+  /* Semantic Aliases */
+  --bg-main:     var(--background);
+  --bg-card:     var(--cards);
+  --bg-subtle:   #EFF9D0;       /* Slightly deeper lime tint           */
+  --bg-hover:    #E5F5BC;       /* Hover surface                       */
   --text-primary: var(--text);
-  --text-muted: var(--muted-text);
-  --text-light: #9CA3AF;
+  --text-muted:  var(--muted-text);
+  --text-light:  #888888;
   --border-light: var(--border);
-  --border-focus: var(--secondary);
+  --border-focus: var(--kiwi-lime);
 
-  /* Primary Tonal Shades (#123B5D) */
-  --primary-dark: #0B243B;
-  --primary-light: #1A507C;
-  --primary-subtle: #EDF3F8;
+  /* Primary Tonal Shades */
+  --primary-dark:   #000000;
+  --primary-light:  #333333;
+  --primary-subtle: #F0FFCC;   /* Very pale lime for badge fills      */
 
-  /* Secondary Tonal Shades (#167D7F) */
-  --secondary-dark: #105D5E;
-  --secondary-light: #1E9FA2;
-  --secondary-subtle: #E8F5F5;
+  /* Secondary (lime) Tonal Shades */
+  --secondary-dark:   #A8D400;   /* Darker lime for pressed states    */
+  --secondary-light:  #DFFF00;   /* Volt — lighter lime               */
+  --secondary-subtle: #EFFFB3;   /* Washout lime tint                 */
 
-  /* Accent Tonal Shades (#E6A23C) */
-  --accent-dark: #C48325;
-  --accent-light: #F3BC66;
-  --accent-subtle: #FEF7EE;
+  /* Accent (volt) Tonal Shades */
+  --accent-dark:   #B8CC00;
+  --accent-light:  #FFFF00;
+  --accent-subtle: #FFFFB3;
 
-  /* Status Tokens */
-  --success: #167D7F;
-  --success-light: #E8F5F5;
-  --success-border: #A3D4D5;
-  --warning: #E6A23C;
-  --warning-light: #FEF7EE;
-  --warning-border: #F8D7A6;
-  --danger: #DC2626;
-  --danger-light: #FEE2E2;
-  --danger-border: #FECDD3;
-  --info: #123B5D;
-  --info-light: #EEF4F9;
-  --info-border: #BDD4E7;
+  /* ── Status Tokens ── */
+  --success:        #22C55E;
+  --success-light:  #DCFCE7;
+  --success-border: #86EFAC;
+  --warning:        #CCFF00;     /* Lime doubles as warning — vivid   */
+  --warning-light:  #F0FFCC;
+  --warning-border: #C4E890;
+  --danger:         #EF4444;
+  --danger-light:   #FEE2E2;
+  --danger-border:  #FECACA;
+  --info:           #3B82F6;
+  --info-light:     #EFF6FF;
+  --info-border:    #BFDBFE;
 
-  /* Backward Compatibility Aliases for components */
+  /* Backward-Compat Aliases */
   --navy-900: var(--primary);
   --navy-800: var(--text);
-  --navy-700: #2C3E50;
+  --navy-700: #333333;
   --amber-600: var(--accent-dark);
   --amber-500: var(--accent);
-  --amber-100: #FDE68A;
-  --amber-50: var(--accent-subtle);
-  --emerald-600: var(--secondary);
-  --emerald-500: var(--secondary);
-  --emerald-50: var(--secondary-subtle);
+  --amber-100: var(--accent-subtle);
+  --amber-50:  var(--accent-subtle);
+  --emerald-600: #16A34A;
+  --emerald-500: #22C55E;
+  --emerald-50:  #DCFCE7;
   --rose-600: var(--danger);
-  --rose-500: #EF4444;
-  --rose-50: var(--danger-light);
-  --indigo-600: #4338CA;
-  --indigo-50: #EEF2FF;
+  --rose-500: #F87171;
+  --rose-50:  var(--danger-light);
+  --indigo-600: #4F46E5;
+  --indigo-50:  #EEF2FF;
 
-  /* Generous Card Padding */
-  --card-padding: 28px;
+  /* Spacing & Radii */
+  --card-padding:    28px;
   --card-padding-sm: 20px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+  --radius-xl:  20px;
 
-  /* Subtle Drop-Shadows on Surfaces */
-  --shadow-sm: 0 1px 3px rgba(18, 59, 93, 0.05), 0 1px 2px rgba(18, 59, 93, 0.03);
-  --shadow-md: 0 4px 12px rgba(18, 59, 93, 0.07), 0 2px 4px rgba(18, 59, 93, 0.04);
-  --shadow-lg: 0 10px 24px rgba(18, 59, 93, 0.08), 0 4px 8px rgba(18, 59, 93, 0.03);
-  --shadow-xl: 0 20px 32px rgba(18, 59, 93, 0.12), 0 8px 16px rgba(18, 59, 93, 0.05);
+  /* Shadows — warm lime-tinted */
+  --shadow-sm: 0 1px 3px rgba(180, 220, 0, 0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 14px rgba(180, 220, 0, 0.10), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 28px rgba(180, 220, 0, 0.12), 0 4px 8px rgba(0,0,0,0.06);
+  --shadow-xl: 0 20px 40px rgba(180, 220, 0, 0.14), 0 8px 16px rgba(0,0,0,0.08);
 
-  /* Strict Typographical Hierarchy */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Typography */
+  --font-sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-display: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* Comprehensive Dark Mode Theme Palette */
+/* ══════════════════════════════════════════════════════════════
+   DARK MODE — Electric Kiwi on Pitch Black
+   Electric lime and volt pop intensely on dark surfaces.
+   Text flips to near-white; lime used as the primary accent glow.
+   ══════════════════════════════════════════════════════════════ */
 :root[data-theme="dark"],
 [data-theme="dark"] {
-  /* Dark Mode Surfaces & Canvas */
-  --background: #0B1320;
-  --cards: #142136;
-  --text: #F1F5F9;
-  --muted-text: #94A3B8;
-  --border: #23354E;
+  /* Surfaces */
+  --background: #080808;   /* Near-black canvas                     */
+  --cards:      #111111;   /* Card surface                          */
+  --text:       #F0FFC0;   /* Warm lime-cream — readable on black   */
+  --muted-text: #9DB86A;   /* Muted lime-grey                       */
+  --border:     #2A3A10;   /* Very dark lime border                 */
 
-  /* Semantic Mappings */
-  --bg-main: var(--background);
-  --bg-card: var(--cards);
-  --bg-subtle: #192841;
-  --bg-hover: #223758;
+  /* Semantics */
+  --bg-main:    var(--background);
+  --bg-card:    var(--cards);
+  --bg-subtle:  #161A0A;   /* Darkest surface layer                 */
+  --bg-hover:   #1E2810;   /* Hover state on dark                   */
   --text-primary: var(--text);
   --text-muted: var(--muted-text);
-  --text-light: #64748B;
+  --text-light: #687A40;
   --border-light: var(--border);
-  --border-focus: #2CD5D8;
+  --border-focus: var(--kiwi-lime);
 
-  /* Brand Accents adapted for Dark Surface Contrast */
-  --primary: #4A90E2;
-  --primary-dark: #0B243B;
-  --primary-light: #7CB5F8;
-  --primary-subtle: #152A47;
+  /* Brand accents — unchanged, they POP on dark */
+  --primary:        #CCFF00;   /* Lime is the hero on dark bg       */
+  --primary-dark:   #A8D400;
+  --primary-light:  #DFFF00;
+  --primary-subtle: #1A2500;   /* Dark lime tint for badge bg       */
 
-  --secondary: #22B2B4;
-  --secondary-dark: #105D5E;
-  --secondary-light: #4DE2E4;
-  --secondary-subtle: #10383C;
+  --secondary:        #DFFF00;
+  --secondary-dark:   #CCFF00;
+  --secondary-light:  #FFFF00;
+  --secondary-subtle: #1E2E00;
 
-  --accent: #F5B041;
-  --accent-dark: #C48325;
-  --accent-light: #F8C471;
-  --accent-subtle: #3A2B12;
+  --accent:        #FFFF00;
+  --accent-dark:   #DFFF00;
+  --accent-light:  #FFFFA0;
+  --accent-subtle: #1E1E00;
 
-  /* Status Tokens */
-  --success: #22B2B4;
-  --success-light: #10383C;
-  --success-border: #1C6467;
-  --warning: #F5B041;
-  --warning-light: #3A2B12;
-  --warning-border: #6B4E1B;
-  --danger: #F87171;
-  --danger-light: #381818;
-  --danger-border: #6B2323;
-  --info: #4A90E2;
-  --info-light: #152A47;
-  --info-border: #234B7D;
+  /* Status Tokens — all adapted for dark */
+  --success:        #4ADE80;
+  --success-light:  #052E16;
+  --success-border: #166534;
+  --warning:        #CCFF00;
+  --warning-light:  #1A2500;
+  --warning-border: #3A5000;
+  --danger:         #F87171;
+  --danger-light:   #2D0707;
+  --danger-border:  #7F1D1D;
+  --info:           #60A5FA;
+  --info-light:     #0F1B35;
+  --info-border:    #1E3A6E;
 
-  /* Backward Compatibility Aliases for components */
+  /* Backward-Compat Aliases */
   --navy-900: var(--primary);
   --navy-800: var(--text);
-  --navy-700: #94A3B8;
+  --navy-700: #CCFF00;
   --amber-600: var(--accent);
   --amber-500: var(--accent);
   --amber-100: var(--accent-subtle);
-  --amber-50: var(--accent-subtle);
-  --emerald-600: var(--secondary);
-  --emerald-500: var(--secondary);
-  --emerald-50: var(--secondary-subtle);
+  --amber-50:  var(--accent-subtle);
+  --emerald-600: #4ADE80;
+  --emerald-500: #4ADE80;
+  --emerald-50:  #052E16;
   --rose-600: var(--danger);
   --rose-500: #F87171;
-  --rose-50: var(--danger-light);
+  --rose-50:  var(--danger-light);
 
-  /* Deep Shadows */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.55), 0 2px 5px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 26px rgba(0, 0, 0, 0.65), 0 4px 10px rgba(0, 0, 0, 0.45);
-  --shadow-xl: 0 20px 38px rgba(0, 0, 0, 0.75), 0 8px 18px rgba(0, 0, 0, 0.55);
+  /* Shadows — lime-glow on dark */
+  --shadow-sm: 0 1px 4px rgba(204, 255, 0, 0.08), 0 1px 2px rgba(0,0,0,0.6);
+  --shadow-md: 0 4px 16px rgba(204, 255, 0, 0.12), 0 2px 6px rgba(0,0,0,0.7);
+  --shadow-lg: 0 10px 30px rgba(204, 255, 0, 0.15), 0 4px 10px rgba(0,0,0,0.8);
+  --shadow-xl: 0 20px 44px rgba(204, 255, 0, 0.18), 0 8px 18px rgba(0,0,0,0.9);
 }
 
 * {
@@ -179,19 +199,19 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Strict Typography Hierarchy */
+/* ── Typography ── */
 h1 {
   font-family: var(--font-display);
   font-size: 26px;
-  font-weight: 700;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
   color: var(--primary);
 }
 
 [data-theme="dark"] h1,
 [data-theme="dark"] h2 {
-  color: #F8FAFC;
+  color: var(--kiwi-lime);
 }
 
 h2 {
@@ -227,18 +247,19 @@ p {
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: var(--bg-subtle);
 }
 ::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 4px;
+  background: var(--kiwi-lime);
+  border-radius: 99px;
+  opacity: 0.6;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-text);
+  background: var(--kiwi-volt);
 }
 
 /* Buttons */
@@ -266,45 +287,52 @@ button, input, select, textarea {
   transform: scale(0.98);
 }
 
+/* ── btn-primary: lime bg · black text ── */
 .btn-primary {
-  background: var(--primary);
-  color: #FFFFFF;
-  box-shadow: 0 2px 6px rgba(18, 59, 93, 0.2);
+  background: var(--kiwi-lime);
+  color: #000000;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(204, 255, 0, 0.35);
 }
 .btn-primary:hover {
-  background: var(--primary-light);
-  box-shadow: 0 4px 12px rgba(18, 59, 93, 0.3);
+  background: var(--kiwi-volt);
+  box-shadow: 0 4px 16px rgba(204, 255, 0, 0.50);
+  transform: translateY(-1px);
 }
 
+/* ── btn-secondary: volt bg · black text ── */
 .btn-secondary {
-  background: var(--secondary);
-  color: #FFFFFF;
-  box-shadow: 0 2px 6px rgba(22, 125, 127, 0.2);
+  background: var(--kiwi-volt);
+  color: #000000;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(223, 255, 0, 0.35);
 }
 .btn-secondary:hover {
-  background: var(--secondary-light);
-  box-shadow: 0 4px 12px rgba(22, 125, 127, 0.3);
+  background: var(--kiwi-yellow);
+  box-shadow: 0 4px 16px rgba(223, 255, 0, 0.50);
 }
 
+/* ── btn-accent: yellow bg · black text ── */
 .btn-accent {
-  background: var(--accent);
-  color: #FFFFFF;
-  box-shadow: 0 2px 8px rgba(230, 162, 60, 0.25);
+  background: var(--kiwi-yellow);
+  color: #000000;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(255, 255, 0, 0.30);
 }
 .btn-accent:hover {
-  background: var(--accent-dark);
-  box-shadow: 0 4px 12px rgba(230, 162, 60, 0.35);
+  background: var(--kiwi-volt);
+  box-shadow: 0 4px 16px rgba(255, 255, 0, 0.45);
 }
 
 .btn-outline {
   background: var(--cards);
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 1.5px solid var(--border);
   box-shadow: var(--shadow-sm);
 }
 .btn-outline:hover {
   background: var(--bg-hover);
-  border-color: #CBD5E1;
+  border-color: var(--kiwi-lime);
   color: var(--primary);
 }
 
@@ -416,9 +444,10 @@ button, input, select, textarea {
   outline: none;
 }
 
+/* focus ring matches lime */
 .form-control:focus {
-  border-color: var(--secondary);
-  box-shadow: 0 0 0 3px rgba(22, 125, 127, 0.15);
+  border-color: var(--kiwi-lime);
+  box-shadow: 0 0 0 3px rgba(204, 255, 0, 0.20);
 }
 
 .form-control.is-invalid {
@@ -456,7 +485,7 @@ button, input, select, textarea {
 
 .card:hover {
   box-shadow: var(--shadow-md);
-  border-color: #CBD5E1;
+  border-color: var(--kiwi-lime);
 }
 
 .card-compact {
@@ -467,8 +496,8 @@ button, input, select, textarea {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(18, 59, 93, 0.45);
-  backdrop-filter: blur(4px);
+  background-color: rgba(0, 0, 0, 0.60);
+  backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -576,35 +605,43 @@ button, input, select, textarea {
   color: var(--primary);
 }
 
-/* Dark Mode Component Overrides */
+/* ── Dark Mode Component Overrides ── */
 [data-theme="dark"] .form-control {
-  background-color: #0E1726;
+  background-color: #0E0E0E;
   color: var(--text);
   border-color: var(--border);
 }
 
 [data-theme="dark"] .form-control:focus {
-  background-color: #121F33;
+  background-color: #141400;
+  border-color: var(--kiwi-lime);
+  box-shadow: 0 0 0 3px rgba(204, 255, 0, 0.18);
 }
 
 [data-theme="dark"] .form-control.is-invalid {
-  background-color: #261414;
+  background-color: #1E0707;
 }
 
 [data-theme="dark"] .modal-overlay {
-  background-color: rgba(3, 8, 16, 0.75);
+  background-color: rgba(0, 0, 0, 0.80);
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-track {
-  background: var(--bg-subtle);
+  background: #0E0E0E;
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb {
-  background: #2D3E56;
+  background: rgba(204, 255, 0, 0.40);
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
-  background: #3E5475;
+  background: rgba(204, 255, 0, 0.70);
+}
+
+/* Lime glow on card hover in dark mode */
+[data-theme="dark"] .card:hover {
+  border-color: rgba(204, 255, 0, 0.35);
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(204, 255, 0, 0.15);
 }
 
 /* ============================================================
