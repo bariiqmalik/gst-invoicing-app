@@ -5,24 +5,30 @@ const supabaseAnonKey =
   import.meta.env.VITE_SUPABASE_ANON_KEY ||
   import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
+/**
+ * Singleton Supabase browser client.
+ * Exported as null when env vars are missing so the app still boots.
+ * Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel → Settings → Environment Variables.
+ */
+let supabase = null;
+
+if (supabaseUrl && supabaseAnonKey) {
+  try {
+    supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+        detectSessionInUrl: false
+      }
+    });
+  } catch (err) {
+    console.error('[Supabase] Failed to initialise client:', err.message);
+  }
+} else {
   console.warn(
-    '[Supabase] VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY is not set. ' +
-    'Check your .env file. Supabase operations will fail.'
+    '[Supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY. ' +
+    'Add them in Vercel → Project → Settings → Environment Variables.'
   );
 }
 
-/**
- * Singleton Supabase browser client.
- * Uses the anon/publishable key — safe for client-side use.
- * Row-Level Security (RLS) on each table enforces data isolation.
- */
-export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    // We manage our own JWT auth via the Express backend.
-    // Disable Supabase Auth listeners to avoid conflicts.
-    autoRefreshToken: false,
-    persistSession: false,
-    detectSessionInUrl: false
-  }
-});
+export { supabase };
