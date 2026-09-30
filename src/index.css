@@ -607,25 +607,210 @@ button, input, select, textarea {
   background: #3E5475;
 }
 
-/* Media Print Rules */
+/* ============================================================
+   PRINT STYLESHEET — GST TAX INVOICE
+   Hides all app chrome; locks invoice to A4 with 12mm margins.
+   ============================================================ */
 @media print {
-  body {
-    background: #FFFFFF !important;
-    color: #000000 !important;
+
+  /* ---------- Page Setup ---------- */
+  @page {
+    size: A4 portrait;
+    margin: 12mm 12mm 14mm 12mm;
   }
-  .no-print {
-    display: none !important;
-  }
-  .invoice-sheet {
+
+  /* ---------- Root Reset ---------- */
+  *,
+  *::before,
+  *::after {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
     box-shadow: none !important;
-    border: none !important;
+    text-shadow: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  html,
+  body {
+    width: 210mm !important;
+    min-height: auto !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: 'Inter', Arial, sans-serif !important;
+    font-size: 10pt !important;
+    line-height: 1.45 !important;
+    margin: 0 !important;
     padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* ---------- Hide ALL app chrome ---------- */
+  /* Navbar / topbar */
+  nav,
+  header:not(.invoice-header),
+  footer:not(.invoice-footer),
+  aside,
+  .navbar,
+  .sidebar,
+  .topbar,
+  .app-nav,
+  .app-header,
+  .app-footer,
+
+  /* Modal chrome (overlay backdrop + action bars) */
+  .modal-overlay > *:not(.modal-content),
+  .modal-header,
+  .modal-footer,
+  .no-print,
+
+  /* Buttons, toasts, tooltips, scrollbars */
+  button,
+  .btn,
+  .toast,
+  .toasts-container,
+  .tooltip,
+  ::-webkit-scrollbar { display: none !important; }
+
+  /* ---------- Modal container — full page, no chrome ---------- */
+  .modal-overlay {
+    position: static !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    display: block !important;
+    z-index: auto !important;
+    inset: auto !important;
+  }
+
+  .modal-content {
+    max-width: 100% !important;
+    max-height: none !important;
+    width: 100% !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    display: block !important;
+    background: #ffffff !important;
+  }
+
+  .modal-body {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* ---------- Invoice sheet — full A4 width ---------- */
+  .invoice-sheet {
     width: 100% !important;
     max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    page-break-inside: avoid;
   }
-  @page {
-    margin: 1.2cm;
-    size: A4 portrait;
+
+  /* ---------- Typography — crisp black on white ---------- */
+  h1, h2, h3, h4, h5, h6 {
+    color: #000000 !important;
+  }
+
+  p, span, div, td, th, li {
+    color: #000000 !important;
+  }
+
+  /* Preserve primary colour only on key invoice headings */
+  .print-primary-color {
+    color: #123B5D !important;
+  }
+
+  /* ---------- Invoice table — no orphans, clean borders ---------- */
+  .invoice-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    font-size: 9pt !important;
+    page-break-inside: auto;
+    margin: 6pt 0 !important;
+  }
+
+  .invoice-table thead {
+    display: table-header-group; /* repeat header on every new page */
+  }
+
+  .invoice-table tfoot {
+    display: table-footer-group;
+  }
+
+  .invoice-table tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  .invoice-table th {
+    background: #f0f4f8 !important;
+    color: #000000 !important;
+    font-size: 8pt !important;
+    padding: 5pt 6pt !important;
+    border: 1px solid #c0c8d2 !important;
+    font-weight: 700 !important;
+    text-align: left;
+  }
+
+  .invoice-table td {
+    padding: 5pt 6pt !important;
+    border: 1px solid #c0c8d2 !important;
+    vertical-align: top !important;
+    word-break: break-word;
+  }
+
+  .invoice-table tr:hover td {
+    background: transparent !important;
+  }
+
+  /* ---------- Totals double-line ---------- */
+  .double-line-total {
+    border-top: 1.5pt solid #123B5D !important;
+    border-bottom: 3pt double #123B5D !important;
+    font-weight: 800 !important;
+    color: #123B5D !important;
+    font-size: 11pt !important;
+  }
+
+  /* ---------- HSN summary mini-table ---------- */
+  .hsn-summary-table {
+    width: 100% !important;
+    font-size: 8.5pt !important;
+    border-collapse: collapse !important;
+  }
+
+  .hsn-summary-table th,
+  .hsn-summary-table td {
+    padding: 4pt 5pt !important;
+    border: 1px solid #c0c8d2 !important;
+  }
+
+  /* ---------- Prevent page-break inside key blocks ---------- */
+  .invoice-header-block,
+  .invoice-party-block,
+  .invoice-totals-block,
+  .invoice-bank-block,
+  .invoice-signatory-block,
+  .invoice-terms-block {
+    page-break-inside: avoid;
+  }
+
+  /* ---------- Force page break before footer section if needed ---------- */
+  .invoice-footer-section {
+    page-break-before: auto;
+  }
+
+  /* ---------- Links — show as plain text ---------- */
+  a[href]::after {
+    content: none !important;
   }
 }
-
