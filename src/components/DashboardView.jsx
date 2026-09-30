@@ -238,14 +238,14 @@ export default function DashboardView({
                   </div>
                 </div>
                 <div style={{
-                  width: '44px';
-                  height: '44px';
-                  borderRadius: '12px';
-                  background: 'var(--accent-subtle)';
-                  color: 'var(--accent-dark)';
-                  display: 'flex';
-                  alignItems: 'center';
-                  justifyContent: 'center';
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '12px',
+                  background: 'var(--accent-subtle)',
+                  color: 'var(--accent-dark)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   boxShadow: 'var(--shadow-sm)'
                 }}>
                   <Clock size={22} />
@@ -270,14 +270,14 @@ export default function DashboardView({
                   </div>
                 </div>
                 <div style={{
-                  width: '44px';
-                  height: '44px';
-                  borderRadius: '12px';
-                  background: 'var(--primary-subtle)';
-                  color: 'var(--primary)';
-                  display: 'flex';
-                  alignItems: 'center';
-                  justifyContent: 'center';
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '12px',
+                  background: 'var(--primary-subtle)',
+                  color: 'var(--primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   boxShadow: 'var(--shadow-sm)'
                 }}>
                   <Percent size={20} />
@@ -303,14 +303,14 @@ export default function DashboardView({
                   </div>
                 </div>
                 <div style={{
-                  width: '44px';
-                  height: '44px';
-                  borderRadius: '12px';
-                  background: 'var(--bg-subtle)';
-                  color: 'var(--primary)';
-                  display: 'flex';
-                  alignItems: 'center';
-                  justifyContent: 'center';
+                  width: '44px',
+                  height: '44px',
+                  borderRadius: '12px',
+                  background: 'var(--bg-subtle)',
+                  color: 'var(--primary)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   boxShadow: 'var(--shadow-sm)'
                 }}>
                   <FileText size={22} />
@@ -338,11 +338,11 @@ export default function DashboardView({
               </div>
 
               <div style={{
-                display: 'grid';
-                gridTemplateColumns: `repeat(${monthlyTrends.length}, 1fr)`;
-                gap: '16px';
-                alignItems: 'flex-end';
-                height: '120px';
+                display: 'grid',
+                gridTemplateColumns: `repeat(${monthlyTrends.length}, 1fr)`,
+                gap: '16px',
+                alignItems: 'flex-end',
+                height: '120px',
                 paddingTop: '20px'
               }}>
                 {(() => {
@@ -355,14 +355,14 @@ export default function DashboardView({
                           {m.revenue > 0 ? `₹${(m.revenue / 1000).toFixed(0)}k` : '₹0'}
                         </div>
                         <div style={{
-                          width: '100%';
-                          maxWidth: '52px';
-                          height: `${heightPct}px`;
+                          width: '100%',
+                          maxWidth: '52px',
+                          height: `${heightPct}px`,
                           background: m.revenue > 0 
                             ? 'linear-gradient(180deg, var(--secondary-light) 0%, var(--secondary) 100%)' 
-                            : 'var(--border)';
-                          borderRadius: '6px 6px 2px 2px';
-                          boxShadow: m.revenue > 0 ? 'var(--shadow-sm)' : 'none';
+                            : 'var(--border)',
+                          borderRadius: '6px 6px 2px 2px',
+                          boxShadow: m.revenue > 0 ? 'var(--shadow-sm)' : 'none',
                           transition: 'height 0.4s ease'
                         }} />
                         <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text)' }}>
@@ -379,16 +379,16 @@ export default function DashboardView({
           {/* Invoice Search & Status Filter Bar (Working Real-Time Toolbar) */}
           <div className="card card-compact" style={{ marginBottom: '24px' }}>
             <div style={{
-              display: 'flex';
-              justifyContent: 'space-between';
-              alignItems: 'center';
-              flexWrap: 'wrap';
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
               gap: '14px'
             }}>
               {/* Search Input with Clear Button */}
               <div style={{
-                position: 'relative';
-                flex: '1';
+                position: 'relative',
+                flex: '1',
                 minWidth: '260px'
               }}>
                 <Search size={16} color="var(--muted-text)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
@@ -406,16 +406,16 @@ export default function DashboardView({
                     type="button"
                     onClick={() => setSearchQuery('')}
                     style={{
-                      position: 'absolute';
-                      right: '10px';
-                      top: '50%';
-                      transform: 'translateY(-50%)';
-                      background: 'none';
-                      border: 'none';
-                      cursor: 'pointer';
-                      color: 'var(--muted-text)';
-                      padding: '4px';
-                      display: 'flex';
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: 'var(--muted-text)',
+                      padding: '4px',
+                      display: 'flex',
                       alignItems: 'center'
                     }}
                     title="Clear search"
@@ -437,9 +437,9 @@ export default function DashboardView({
                       onClick={() => setStatusFilter(status)}
                       className={`btn btn-sm ${active ? 'btn-primary' : 'btn-outline'}`}
                       style={{
-                        fontSize: '12px';
-                        padding: '6px 14px';
-                        fontWeight: active ? 700 : 500;
+                        fontSize: '12px',
+                        padding: '6px 14px',
+                        fontWeight: active ? 700 : 500,
                         boxShadow: active ? '0 2px 6px rgba(18, 59, 93, 0.25)' : 'none'
                       }}
                     >
@@ -465,16 +465,16 @@ export default function DashboardView({
           {/* Active Filter Feedback Banner */}
           {isFiltering && (
             <div style={{
-              display: 'flex';
-              alignItems: 'center';
-              justifyContent: 'space-between';
-              padding: '10px 16px';
-              background: 'var(--bg-subtle)';
-              borderRadius: 'var(--radius-md)';
-              border: '1px solid var(--border)';
-              marginBottom: '20px';
-              fontSize: '13px';
-              flexWrap: 'wrap';
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '10px 16px',
+              background: 'var(--bg-subtle)',
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border)',
+              marginBottom: '20px',
+              fontSize: '13px',
+              flexWrap: 'wrap',
               gap: '8px'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text)' }}>
@@ -594,30 +594,30 @@ export default function DashboardView({
                           <td>
                             {isInter ? (
                               <span style={{
-                                display: 'inline-flex';
-                                alignItems: 'center';
-                                gap: '4px';
-                                background: 'var(--primary-subtle)';
-                                color: 'var(--primary)';
-                                fontSize: '11px';
-                                fontWeight: 700;
-                                padding: '3px 8px';
-                                borderRadius: '4px';
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                background: 'var(--primary-subtle)',
+                                color: 'var(--primary)',
+                                fontSize: '11px',
+                                fontWeight: 700,
+                                padding: '3px 8px',
+                                borderRadius: '4px',
                                 border: '1px solid var(--info-border)'
                               }}>
                                 🔵 IGST
                               </span>
                             ) : (
                               <span style={{
-                                display: 'inline-flex';
-                                alignItems: 'center';
-                                gap: '4px';
-                                background: 'var(--secondary-subtle)';
-                                color: 'var(--secondary)';
-                                fontSize: '11px';
-                                fontWeight: 700;
-                                padding: '3px 8px';
-                                borderRadius: '4px';
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                background: 'var(--secondary-subtle)',
+                                color: 'var(--secondary)',
+                                fontSize: '11px',
+                                fontWeight: 700,
+                                padding: '3px 8px',
+                                borderRadius: '4px',
                                 border: '1px solid var(--success-border)'
                               }}>
                                 🟢 CGST + SGST
@@ -625,12 +625,12 @@ export default function DashboardView({
                             )}
                             {inv.reverseCharge && (
                               <span style={{
-                                marginLeft: '4px';
-                                fontSize: '10px';
-                                background: 'var(--danger-light)';
-                                color: 'var(--danger)';
-                                padding: '2px 5px';
-                                borderRadius: '3px';
+                                marginLeft: '4px',
+                                fontSize: '10px',
+                                background: 'var(--danger-light)',
+                                color: 'var(--danger)',
+                                padding: '2px 5px',
+                                borderRadius: '3px',
                                 fontWeight: 700
                               }}>
                                 RCM
@@ -783,9 +783,9 @@ export default function DashboardView({
                     </div>
                   </div>
                   <div style={{
-                    width: '44px';
-                    height: '44px';
-                    borderRadius: '12px';
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '12px',
                     background: 'var(--secondary-subtle)',
                     color: 'var(--secondary)',
                     display: 'flex',
@@ -822,9 +822,9 @@ export default function DashboardView({
                     </div>
                   </div>
                   <div style={{
-                    width: '44px';
-                    height: '44px';
-                    borderRadius: '12px';
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '12px',
                     background: 'var(--primary-subtle)',
                     color: 'var(--primary)',
                     display: 'flex',
@@ -862,14 +862,14 @@ export default function DashboardView({
                     </div>
                   </div>
                   <div style={{
-                    width: '44px';
-                    height: '44px';
-                    borderRadius: '12px';
-                    background: 'var(--accent-subtle)';
-                    color: 'var(--accent-dark)';
-                    display: 'flex';
-                    alignItems: 'center';
-                    justifyContent: 'center';
+                    width: '44px',
+                    height: '44px',
+                    borderRadius: '12px',
+                    background: 'var(--accent-subtle)',
+                    color: 'var(--accent-dark)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     boxShadow: 'var(--shadow-sm)'
                   }}>
                     <Clock size={22} />
@@ -883,7 +883,7 @@ export default function DashboardView({
               <p style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text)' }}>Loading GST reports...</p>
             </div>
           )}
-        }
+        </div>
       )}
     </div>
   );
