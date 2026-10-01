@@ -57,14 +57,14 @@ export default function Navbar({
               width: '38px',
               height: '38px',
               borderRadius: '10px',
-              background: 'var(--gothic-espresso)',
+              background: 'linear-gradient(135deg, var(--palette-forest) 0%, var(--palette-green) 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#ffffff',
-              boxShadow: '0 3px 8px rgba(0,0,0,0.18)'
+              boxShadow: '0 3px 10px rgba(39, 111, 39, 0.28)'
             }}>
-              <FileText size={20} color="var(--gothic-light)" />
+              <FileText size={20} color="var(--palette-lime)" />
             </div>
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -75,16 +75,16 @@ export default function Navbar({
                   letterSpacing: '-0.3px',
                   color: 'var(--primary)'
                 }}>
-                  BillGST<span style={{ color: 'var(--gothic-taupe)' }}>.Pro</span>
+                  BillGST<span style={{ color: 'var(--palette-green)' }}>.Pro</span>
                 </span>
                 <span style={{
                   fontSize: '10px',
-                  background: 'var(--bg-subtle)',
-                  color: 'var(--text)',
-                  border: '1px solid var(--border)',
+                  background: 'var(--palette-lime)',
+                  color: '#142914',
                   padding: '2px 6px',
                   borderRadius: '4px',
-                  fontWeight: 700
+                  fontWeight: 800,
+                  letterSpacing: '0.3px'
                 }}>
                   GST INDIA
                 </span>
@@ -138,12 +138,12 @@ export default function Navbar({
           >
             {theme === 'dark' ? (
               <>
-                <Sun size={15} style={{ color: '#E5A54B' }} />
+                <Sun size={15} style={{ color: 'var(--palette-lime)' }} />
                 <span style={{ fontSize: '12px', fontWeight: 600 }}>Light</span>
               </>
             ) : (
               <>
-                <Moon size={15} style={{ color: 'var(--primary)' }} />
+                <Moon size={15} style={{ color: 'var(--palette-forest)' }} />
                 <span style={{ fontSize: '12px', fontWeight: 600 }}>Dark</span>
               </>
             )}
@@ -162,7 +162,7 @@ export default function Navbar({
               width: '26px',
               height: '26px',
               borderRadius: '50%',
-              background: 'var(--gothic-espresso)',
+              background: 'linear-gradient(135deg, var(--palette-forest) 0%, var(--palette-green) 100%)',
               color: '#ffffff',
               display: 'flex',
               alignItems: 'center',
@@ -176,8 +176,8 @@ export default function Navbar({
               <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text)' }}>
                 {user?.name || 'Owner'}
               </div>
-              <div style={{ fontSize: '10px', color: 'var(--muted-text)', display: 'flex', alignItems: 'center', gap: '3px', fontWeight: 600 }}>
-                <ShieldCheck size={10} color="var(--accent)" /> Owner Access
+              <div style={{ fontSize: '10px', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '3px', fontWeight: 600 }}>
+                <ShieldCheck size={10} color="var(--primary)" /> Owner Access
               </div>
             </div>
           </div>

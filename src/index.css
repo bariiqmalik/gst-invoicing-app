@@ -1,93 +1,95 @@
 /* ══════════════════════════════════════════════════════════════
-   GOTHIC NOIR — Design Token System
-   Palette:
-     #000000 (Pure Black — deep anchor, headlines, contrasts)
-     #D1D0D0 (Light Gray — atmospheric canvas, clean accents)
-     #988686 (Warm Rosy Taupe — moody midtone, highlights)
-     #5C4E4E (Charcoal Taupe / Deep Espresso — rich CTA, borders)
-
-   Philosophy:
-     "This color palette's black, gray, and taupe shades create a
-      sophisticated and moody pairing. Using the lightest shade as
-      the background and the other shades for highlights and accents
-      leads to a pleasing design that's not overly dark."
+   VERDANT SPECTRUM — 4-Color Indian GST Design System
+   Exact Swatch Palette:
+     #499A13 (Meadow Green) — Primary vivid brand, key metrics, active states
+     #BBDC12 (Electric Lime)— Luminous hero accent, focus glow, tag pops, highlights
+     #8ECA3C (Apple Leaf)   — Secondary accents, positive metrics, fresh badges
+     #276F27 (Deep Forest)  — Authority, primary dark base, headers, contrast
    ══════════════════════════════════════════════════════════════ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap');
 
 :root {
-  /* ── Core Gothic Noir brand palette ── */
-  --gothic-black:    #000000;   /* Pure deep black */
-  --gothic-light:    #D1D0D0;   /* Light gray canvas / highlight */
-  --gothic-taupe:    #988686;   /* Warm rosy taupe / mauve slate */
-  --gothic-espresso: #5C4E4E;   /* Charcoal taupe / deep espresso */
+  /* ── Core Verdant Palette Swatch ── */
+  --palette-green:  #499A13;   /* Top band: Vivid Meadow Green */
+  --palette-lime:   #BBDC12;   /* Second band: Electric Lime Chartreuse */
+  --palette-leaf:   #8ECA3C;   /* Third band: Bright Spring / Apple Green */
+  --palette-forest: #276F27;   /* Bottom band: Deep Forest Pine */
 
-  /* ── Light Mode (Moodily atmospheric, elegant, not overly dark) ── */
-  --background:      #D1D0D0;   /* Lightest shade as background (#D1D0D0) */
-  --cards:           #FFFFFF;   /* Pure white card / surface for financial clarity */
-  --primary:         #000000;   /* Pure black headlines & strong anchors */
-  --secondary:       #5C4E4E;   /* Deep charcoal-taupe CTA */
-  --accent:          #988686;   /* Rosy taupe accents & badges */
-  --text:            #1A1717;   /* Ultra-crisp readable body text */
-  --muted-text:      #5C4E4E;   /* Deep taupe secondary labels */
-  --border:          #B8B4B4;   /* Refined taupe-tinted borders */
+  /* ── Backward-Compatible Emerald Aliases ── */
+  --emerald-deep:   #276F27;
+  --emerald-dark:   #194B19;
+  --emerald-jade:   #499A13;
+  --emerald-mint:   #BBDC12;
 
-  /* Semantic Aliases */
-  --bg-main:         var(--background);
-  --bg-card:         var(--cards);
-  --bg-subtle:       #E2DFDF;   /* Sub-tier surface (tabs, table headers) */
-  --bg-hover:        #EAE7E7;   /* Row & action hover */
-  --text-primary:    var(--text);
-  --text-muted:      var(--muted-text);
-  --text-light:      #786E6E;
-  --border-light:    var(--border);
-  --border-focus:    var(--gothic-espresso);
+  /* ── Light Mode Surfaces — crisp, organic, pristine canvas ── */
+  --background:     #F7FAF4;   /* Soft verdant-tinted clean canvas */
+  --cards:          #FFFFFF;   /* Pure white card / modal surfaces */
+  --bg-main:        var(--background);
+  --bg-card:        var(--cards);
+  --bg-subtle:      #EDF7E7;   /* Pale sage wash — tabs, table headers */
+  --bg-hover:       #E2F2D9;   /* Fresh green blush on hover */
 
-  /* Primary Tonal Shades */
-  --primary-dark:    #000000;
-  --primary-light:   #332B2B;
-  --primary-subtle:  #E8E3E3;
+  /* ── Typography & Text (Light Mode) ── */
+  --text:           #142914;   /* Deep forest black — razor sharp legibility */
+  --muted-text:     #496649;   /* Balanced pine-slate captions */
+  --text-primary:   var(--text);
+  --text-muted:     var(--muted-text);
+  --text-light:     #7A967A;
 
-  /* Secondary Tonal Shades */
-  --secondary-dark:  #443838;
-  --secondary-light: #736262;
-  --secondary-subtle:#F0ECEC;
+  /* ── Borders & Outlines ── */
+  --border:         #D3E8CD;   /* Soft, elegant verdant border */
+  --border-light:   #E4F2DF;
+  --border-focus:   var(--palette-green);
 
-  /* Accent Tonal Shades */
-  --accent-dark:     #5C4E4E;
-  --accent-light:    #B2A2A2;
-  --accent-subtle:   #EAE5E5;
+  /* ── Primary Tokens (Deep Forest & Meadow Green) ── */
+  --primary:        #276F27;   /* Authoritative deep forest hero */
+  --primary-dark:   #194B19;   /* Deep pine base */
+  --primary-light:  #499A13;
+  --primary-subtle: #EBF7E5;   /* Soft pastel forest fill */
 
-  /* Status Tokens (Harmonious with taupe palette) */
-  --success:         #1F6B38;
-  --success-light:   #E5F2E9;
-  --success-border:  #9FD3AE;
-  --warning:         #9E6015;
-  --warning-light:   #FAF0E1;
-  --warning-border:  #E8C68C;
-  --danger:          #A82424;
-  --danger-light:    #FCEBEB;
-  --danger-border:   #F3B3B3;
-  --info:            #385072;
-  --info-light:      #EDF3FA;
-  --info-border:     #B0C6E3;
+  /* ── Secondary Tokens (Meadow & Apple Green) ── */
+  --secondary:        #499A13;   /* Vivid Meadow Green */
+  --secondary-dark:   #276F27;
+  --secondary-light:  #8ECA3C;   /* Bright Apple Green */
+  --secondary-subtle: #F0F8E8;
 
-  /* Backward-Compat Aliases */
+  /* ── Accent Tokens (Electric Lime #BBDC12) ── */
+  --accent:         #BBDC12;   /* Luminous Electric Lime */
+  --accent-dark:    #8ECA3C;
+  --accent-light:   #D6F147;
+  --accent-subtle:  #F7FDE6;
+
+  /* ── Status Tokens ── */
+  --success:        #2E7D32;
+  --success-light:  #E8F5E9;
+  --success-border: #8ECA3C;
+  --warning:        #D97706;
+  --warning-light:  #FEF3C7;
+  --warning-border: #FCD34D;
+  --danger:         #DC2626;
+  --danger-light:   #FEE2E2;
+  --danger-border:  #FECACA;
+  --info:           #0284C7;
+  --info-light:     #E0F2FE;
+  --info-border:    #BAE6FD;
+
+  /* ── Backward-Compat Aliases ── */
   --navy-900: var(--primary);
   --navy-800: var(--text);
-  --navy-700: #332B2B;
-  --amber-600: var(--accent-dark);
-  --amber-500: var(--accent);
-  --amber-100: var(--accent-subtle);
-  --amber-50:  var(--accent-subtle);
-  --emerald-600: var(--success);
-  --emerald-500: var(--success);
-  --emerald-50:  var(--success-light);
+  --navy-700: var(--primary-dark);
+  --amber-600: var(--warning);
+  --amber-500: var(--warning);
+  --amber-100: var(--warning-light);
+  --amber-50:  var(--warning-light);
+  --emerald-600: var(--palette-green);
+  --emerald-500: var(--palette-leaf);
+  --emerald-50:  var(--primary-subtle);
   --rose-600: var(--danger);
-  --rose-500: var(--danger);
+  --rose-500: #F87171;
   --rose-50:  var(--danger-light);
-  --indigo-600: var(--info);
-  --indigo-50:  var(--info-light);
+  --indigo-600: #0284C7;
+  --indigo-50:  #E0F2FE;
 
   /* Spacing & Radii */
   --card-padding:    28px;
@@ -97,11 +99,11 @@
   --radius-lg:  14px;
   --radius-xl:  20px;
 
-  /* Shadows — subtle taupe-tinted depth */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(92, 78, 78, 0.04);
-  --shadow-md: 0 4px 14px rgba(0,0,0,0.08), 0 2px 5px rgba(92, 78, 78, 0.05);
-  --shadow-lg: 0 10px 30px rgba(0,0,0,0.10), 0 4px 10px rgba(92, 78, 78, 0.06);
-  --shadow-xl: 0 20px 42px rgba(0,0,0,0.12), 0 8px 18px rgba(92, 78, 78, 0.07);
+  /* Shadows — verdant tinted, soft depth */
+  --shadow-sm: 0 1px 3px rgba(39, 111, 39, 0.06), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 14px rgba(39, 111, 39, 0.09), 0 2px 4px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 28px rgba(39, 111, 39, 0.12), 0 4px 8px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 44px rgba(39, 111, 39, 0.15), 0 8px 16px rgba(0, 0, 0, 0.05);
 
   /* Typography */
   --font-sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -109,80 +111,81 @@
 }
 
 /* ══════════════════════════════════════════════════════════════
-   DARK MODE — Gothic Noir Night
-   Deep Pitch Black (#000000) base, rich espresso-slate surfaces (#161313),
-   ultra-readable light gray text (#D1D0D0) and warm taupe accents (#988686).
+   DARK MODE — Verdant Spectrum on Deep Obsidian Forest
+   Electric Lime (#BBDC12) & Meadow Green glow against obsidian.
    ══════════════════════════════════════════════════════════════ */
 :root[data-theme="dark"],
 [data-theme="dark"] {
   /* Surfaces */
-  --background: #000000;   /* Palette #000000 pitch black canvas */
-  --cards:      #161313;   /* Deep gothic espresso-slate card surface */
-  --text:       #D1D0D0;   /* Palette #D1D0D0 light gray text — supreme readability */
-  --muted-text: #988686;   /* Palette #988686 warm rosy taupe */
-  --border:     #383030;   /* Deep warm charcoal border */
-
-  /* Semantics */
+  --background: #091409;   /* Deep obsidian forest canvas */
+  --cards:      #112311;   /* Rich pine green card surface */
   --bg-main:    var(--background);
   --bg-card:    var(--cards);
-  --bg-subtle:  #211C1C;   /* Tabs, table headers */
-  --bg-hover:   #2C2525;   /* Row hover state */
-  --text-primary: #FFFFFF; /* High-contrast white for headings */
-  --text-muted: var(--muted-text);
-  --text-light: #7E7070;
-  --border-light: var(--border);
-  --border-focus: var(--gothic-taupe);
+  --bg-subtle:  #173217;   /* Elevated surface for tables, tab bars */
+  --bg-hover:   #1F431F;   /* Interactive hover feedback */
 
-  /* Brand accents in dark */
-  --primary:        #FFFFFF;   /* Crisp white headings on dark */
-  --primary-dark:   #D1D0D0;
-  --primary-light:  #FFFFFF;
-  --primary-subtle: #2B2323;
+  /* Typography & Text */
+  --text:           #F2FAF1;   /* Crisp white with gentle lime warmth */
+  --muted-text:     #91B390;   /* Clear, legible sage slate */
+  --text-primary:   var(--text);
+  --text-muted:     var(--muted-text);
+  --text-light:     #638562;
 
-  --secondary:        #D1D0D0; /* Palette light gray CTA in dark */
-  --secondary-dark:   #B5B2B2;
-  --secondary-light:  #FFFFFF;
-  --secondary-subtle: #2E2626;
+  /* Borders & Outlines */
+  --border:         #1E421E;   /* Clear definition against dark background */
+  --border-light:   #285628;
+  --border-focus:   var(--palette-lime);
 
-  --accent:        #988686;    /* Palette rosy taupe */
-  --accent-dark:   #D1D0D0;
-  --accent-light:  #B5A6A6;
-  --accent-subtle: #262020;
+  /* Brand Accents — Electric Lime #BBDC12 is luminous hero on dark */
+  --primary:        #BBDC12;   /* Electric Lime glows on dark */
+  --primary-dark:   #8ECA3C;
+  --primary-light:  #D5F047;
+  --primary-subtle: #1A3714;   /* Deep verdant badge fill */
 
-  /* Status Tokens adapted for dark */
+  --secondary:        #8ECA3C;   /* Bright Apple Green */
+  --secondary-dark:   #499A13;
+  --secondary-light:  #BBDC12;
+  --secondary-subtle: #193813;
+
+  --accent:         #BBDC12;
+  --accent-dark:    #8ECA3C;
+  --accent-light:   #E4F96C;
+  --accent-subtle:  #1F3E0F;
+
+  /* Status Tokens (Adapted for Dark) */
   --success:        #4ADE80;
-  --success-light:  #082411;
-  --success-border: #166534;
+  --success-light:  #082A0F;
+  --success-border: #16A34A;
   --warning:        #FBBF24;
-  --warning-light:  #2A1D05;
-  --warning-border: #854D0E;
+  --warning-light:  #2D2005;
+  --warning-border: #B45309;
   --danger:         #F87171;
-  --danger-light:   #2B0C0C;
-  --danger-border:  #7F1D1D;
-  --info:           #60A5FA;
-  --info-light:     #0D1B33;
-  --info-border:    #1E3A8A;
+  --danger-light:   #2D0B0B;
+  --danger-border:  #B91C1C;
+  --info:           #38BDF8;
+  --info-light:     #08263B;
+  --info-border:    #0369A1;
 
   /* Backward-Compat Aliases */
   --navy-900: var(--primary);
   --navy-800: var(--text);
-  --navy-700: #FFFFFF;
-  --amber-600: var(--accent);
-  --amber-500: var(--accent);
-  --amber-100: var(--accent-subtle);
-  --amber-50:  var(--accent-subtle);
-  --emerald-600: #4ADE80;
-  --emerald-500: #4ADE80;
-  --emerald-50:  #082411;
+  --navy-700: #BBDC12;
+  --amber-600: var(--warning);
+  --amber-500: var(--warning);
+  --amber-100: var(--warning-light);
+  --amber-50:  var(--warning-light);
+  --emerald-600: #8ECA3C;
+  --emerald-500: #499A13;
+  --emerald-50:  #1A3714;
   --rose-600: var(--danger);
   --rose-500: #F87171;
   --rose-50:  var(--danger-light);
 
-  /* Shadows — subtle gothic moody depth */
-  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.6);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.7);
-  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.85);
-  --shadow-xl: 0 20px 48px rgba(0, 0, 0, 0.95);
+  /* Shadows — dark forest depth */
+  --shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.60);
+  --shadow-md: 0 4px 18px rgba(0, 0, 0, 0.70), 0 0 1px rgba(187, 220, 18, 0.15);
+  --shadow-lg: 0 10px 32px rgba(0, 0, 0, 0.80), 0 0 2px rgba(187, 220, 18, 0.12);
+  --shadow-xl: 0 20px 50px rgba(0, 0, 0, 0.90), 0 0 3px rgba(187, 220, 18, 0.18);
 }
 
 * {
@@ -218,7 +221,7 @@ h1 {
 
 [data-theme="dark"] h1,
 [data-theme="dark"] h2 {
-  color: #FFFFFF;
+  color: var(--emerald-mint);
 }
 
 h2 {
@@ -261,12 +264,12 @@ p {
   background: var(--bg-subtle);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--gothic-taupe);
+  background: var(--emerald-jade);
   border-radius: 99px;
-  opacity: 0.7;
+  opacity: 0.6;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--gothic-espresso);
+  background: var(--emerald-deep);
 }
 
 /* Buttons */
@@ -294,52 +297,56 @@ button, input, select, textarea {
   transform: scale(0.98);
 }
 
-/* ── btn-primary: Gothic Espresso (light) / Gothic Light (dark) ── */
+/* ── btn-primary: Deep Forest & Meadow Green (Light) ── */
 .btn-primary {
-  background: var(--gothic-espresso);
+  background: linear-gradient(135deg, var(--palette-forest) 0%, var(--palette-green) 100%);
   color: #FFFFFF;
-  border-color: #4A3E3E;
-  box-shadow: 0 2px 8px rgba(92, 78, 78, 0.28);
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(39, 111, 39, 0.28);
 }
 .btn-primary:hover {
-  background: #473B3B;
-  box-shadow: 0 4px 14px rgba(92, 78, 78, 0.40);
+  background: linear-gradient(135deg, #1C541C 0%, #3B800F 100%);
+  box-shadow: 0 4px 16px rgba(39, 111, 39, 0.38);
   transform: translateY(-1px);
 }
 
-/* ── btn-secondary: Warm Rosy Taupe ── */
+/* ── btn-secondary: Apple Green #8ECA3C ── */
 .btn-secondary {
-  background: var(--gothic-taupe);
-  color: #FFFFFF;
+  background: var(--palette-leaf);
+  color: #0E290E;
+  font-weight: 700;
   border-color: transparent;
-  box-shadow: 0 2px 8px rgba(152, 134, 134, 0.25);
+  box-shadow: 0 2px 8px rgba(142, 202, 60, 0.25);
 }
 .btn-secondary:hover {
-  background: #847272;
-  box-shadow: 0 4px 14px rgba(152, 134, 134, 0.35);
+  background: #7DB832;
+  box-shadow: 0 4px 14px rgba(142, 202, 60, 0.35);
+  transform: translateY(-1px);
 }
 
-/* ── btn-accent: Gothic Black ── */
+/* ── btn-accent: Electric Lime #BBDC12 ── */
 .btn-accent {
-  background: var(--gothic-black);
-  color: #FFFFFF;
+  background: var(--palette-lime);
+  color: #102B08;
+  font-weight: 700;
   border-color: transparent;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 2px 10px rgba(187, 220, 18, 0.32);
 }
 .btn-accent:hover {
-  background: #2D2626;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  background: #A8C710;
+  box-shadow: 0 4px 16px rgba(187, 220, 18, 0.45);
+  transform: translateY(-1px);
 }
 
 .btn-outline {
   background: var(--cards);
-  color: var(--text);
+  color: var(--primary);
   border: 1.5px solid var(--border);
   box-shadow: var(--shadow-sm);
 }
 .btn-outline:hover {
   background: var(--bg-hover);
-  border-color: var(--gothic-taupe);
+  border-color: var(--primary);
   color: var(--primary);
 }
 
@@ -381,15 +388,15 @@ button, input, select, textarea {
 }
 
 .badge-paid {
-  background-color: var(--secondary-subtle);
-  color: var(--secondary);
+  background-color: var(--primary-subtle);
+  color: var(--primary);
   border: 1px solid var(--success-border);
 }
 
 .badge-sent {
-  background-color: var(--primary-subtle);
-  color: var(--primary);
-  border: 1px solid var(--info-border);
+  background-color: var(--secondary-subtle);
+  color: var(--secondary-dark);
+  border: 1px solid var(--border);
 }
 
 .badge-draft {
@@ -399,8 +406,8 @@ button, input, select, textarea {
 }
 
 .badge-partial {
-  background-color: var(--accent-subtle);
-  color: var(--accent-dark);
+  background-color: var(--warning-light);
+  color: var(--warning);
   border: 1px solid var(--warning-border);
 }
 
@@ -451,10 +458,10 @@ button, input, select, textarea {
   outline: none;
 }
 
-/* focus ring matches Gothic Espresso */
+/* Focus ring matches Verdant Meadow & Lime */
 .form-control:focus {
-  border-color: var(--gothic-espresso);
-  box-shadow: 0 0 0 3px rgba(92, 78, 78, 0.20);
+  border-color: var(--palette-green);
+  box-shadow: 0 0 0 3px rgba(73, 154, 19, 0.20);
 }
 
 .form-control.is-invalid {
@@ -492,7 +499,7 @@ button, input, select, textarea {
 
 .card:hover {
   box-shadow: var(--shadow-md);
-  border-color: var(--gothic-taupe);
+  border-color: var(--emerald-jade);
 }
 
 .card-compact {
@@ -503,7 +510,7 @@ button, input, select, textarea {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.60);
+  background-color: rgba(10, 60, 48, 0.45);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
@@ -575,6 +582,41 @@ button, input, select, textarea {
   position: relative;
 }
 
+.invoice-stamp {
+  display: inline-block;
+  background: var(--emerald-deep);
+  color: #ffffff;
+  padding: 6px 18px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+[data-theme="dark"] .invoice-stamp {
+  background: var(--emerald-mint);
+  color: #0A3C30;
+}
+
+.invoice-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  background: var(--emerald-deep);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  fontSize: 18px;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .invoice-avatar {
+  background: var(--emerald-mint);
+  color: #0A3C30;
+}
+
 .invoice-table {
   width: 100%;
   border-collapse: collapse;
@@ -614,74 +656,107 @@ button, input, select, textarea {
 
 /* ── Dark Mode Component Overrides ── */
 [data-theme="dark"] .btn-primary {
-  background: var(--gothic-light);
-  color: #000000;
-  border-color: var(--gothic-light);
-  box-shadow: 0 2px 10px rgba(209, 208, 208, 0.20);
+  background: var(--palette-lime);
+  color: #0B2108;
+  font-weight: 700;
+  border-color: transparent;
+  box-shadow: 0 2px 10px rgba(187, 220, 18, 0.35);
 }
 
 [data-theme="dark"] .btn-primary:hover {
-  background: #FFFFFF;
-  box-shadow: 0 4px 16px rgba(255, 255, 255, 0.30);
+  background: #D2F028;
+  box-shadow: 0 4px 18px rgba(187, 220, 18, 0.50);
 }
 
 [data-theme="dark"] .btn-secondary {
-  background: var(--gothic-espresso);
+  background: var(--palette-forest);
   color: #FFFFFF;
-  border-color: #4A3E3E;
+  border-color: #388E2E;
 }
 
 [data-theme="dark"] .btn-secondary:hover {
-  background: #6E5E5E;
+  background: #2E852E;
 }
 
 [data-theme="dark"] .btn-accent {
-  background: var(--gothic-taupe);
-  color: #000000;
+  background: var(--palette-leaf);
+  color: #071E07;
   font-weight: 700;
-  border-color: var(--gothic-taupe);
 }
 
 [data-theme="dark"] .btn-accent:hover {
-  background: #B1A2A2;
+  background: #A1DC48;
 }
 
 [data-theme="dark"] .form-control {
-  background-color: #121010;
+  background-color: #0C1E0C;
   color: var(--text);
   border-color: var(--border);
 }
 
 [data-theme="dark"] .form-control:focus {
-  background-color: #1A1616;
-  border-color: var(--gothic-taupe);
-  box-shadow: 0 0 0 3px rgba(152, 134, 134, 0.25);
+  background-color: #102610;
+  border-color: var(--palette-lime);
+  box-shadow: 0 0 0 3px rgba(187, 220, 18, 0.22);
 }
 
 [data-theme="dark"] .form-control.is-invalid {
-  background-color: #240E0E;
+  background-color: #260A0A;
 }
 
 [data-theme="dark"] .modal-overlay {
-  background-color: rgba(0, 0, 0, 0.85);
+  background-color: rgba(4, 12, 4, 0.85);
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-track {
-  background: #121010;
+  background: #091709;
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb {
-  background: rgba(152, 134, 134, 0.45);
+  background: rgba(187, 220, 18, 0.35);
 }
 
 [data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
-  background: var(--gothic-light);
+  background: rgba(187, 220, 18, 0.70);
 }
 
-/* Warm taupe edge highlight on card hover in dark mode */
+/* Electric Lime glow on card hover in dark mode */
 [data-theme="dark"] .card:hover {
-  border-color: var(--gothic-taupe);
-  box-shadow: var(--shadow-md), 0 0 0 1px rgba(152, 134, 134, 0.20);
+  border-color: rgba(187, 220, 18, 0.35);
+  box-shadow: var(--shadow-md), 0 0 14px rgba(187, 220, 18, 0.10);
+}
+
+/* ── Verdant Swatch & Minimalist Utilities ── */
+.palette-swatch-bar {
+  display: flex;
+  height: 4px;
+  width: 100%;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.palette-stripe-1 { background-color: #499A13; flex: 1; }
+.palette-stripe-2 { background-color: #BBDC12; flex: 1; }
+.palette-stripe-3 { background-color: #8ECA3C; flex: 1; }
+.palette-stripe-4 { background-color: #276F27; flex: 1; }
+
+.palette-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  color: var(--primary);
+}
+
+.palette-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
 }
 
 /* ============================================================
@@ -724,7 +799,6 @@ button, input, select, textarea {
   }
 
   /* ---------- Hide ALL app chrome ---------- */
-  /* Navbar / topbar */
   nav,
   header:not(.invoice-header),
   footer:not(.invoice-footer),
@@ -735,14 +809,10 @@ button, input, select, textarea {
   .app-nav,
   .app-header,
   .app-footer,
-
-  /* Modal chrome (overlay backdrop + action bars) */
   .modal-overlay > *:not(.modal-content),
   .modal-header,
   .modal-footer,
   .no-print,
-
-  /* Buttons, toasts, tooltips, scrollbars */
   button,
   .btn,
   .toast,
@@ -803,7 +873,7 @@ button, input, select, textarea {
 
   /* Preserve primary colour only on key invoice headings */
   .print-primary-color {
-    color: #123B5D !important;
+    color: #00674F !important;
   }
 
   /* ---------- Invoice table — no orphans, clean borders ---------- */
@@ -816,7 +886,7 @@ button, input, select, textarea {
   }
 
   .invoice-table thead {
-    display: table-header-group; /* repeat header on every new page */
+    display: table-header-group;
   }
 
   .invoice-table tfoot {
@@ -829,18 +899,18 @@ button, input, select, textarea {
   }
 
   .invoice-table th {
-    background: #f0f4f8 !important;
+    background: #E8F4F0 !important;
     color: #000000 !important;
     font-size: 8pt !important;
     padding: 5pt 6pt !important;
-    border: 1px solid #c0c8d2 !important;
+    border: 1px solid #BBD8CD !important;
     font-weight: 700 !important;
     text-align: left;
   }
 
   .invoice-table td {
     padding: 5pt 6pt !important;
-    border: 1px solid #c0c8d2 !important;
+    border: 1px solid #BBD8CD !important;
     vertical-align: top !important;
     word-break: break-word;
   }
@@ -851,10 +921,10 @@ button, input, select, textarea {
 
   /* ---------- Totals double-line ---------- */
   .double-line-total {
-    border-top: 1.5pt solid #123B5D !important;
-    border-bottom: 3pt double #123B5D !important;
+    border-top: 1.5pt solid #00674F !important;
+    border-bottom: 3pt double #00674F !important;
     font-weight: 800 !important;
-    color: #123B5D !important;
+    color: #00674F !important;
     font-size: 11pt !important;
   }
 
@@ -868,7 +938,7 @@ button, input, select, textarea {
   .hsn-summary-table th,
   .hsn-summary-table td {
     padding: 4pt 5pt !important;
-    border: 1px solid #c0c8d2 !important;
+    border: 1px solid #BBD8CD !important;
   }
 
   /* ---------- Prevent page-break inside key blocks ---------- */
@@ -881,12 +951,10 @@ button, input, select, textarea {
     page-break-inside: avoid;
   }
 
-  /* ---------- Force page break before footer section if needed ---------- */
   .invoice-footer-section {
     page-break-before: auto;
   }
 
-  /* ---------- Links — show as plain text ---------- */
   a[href]::after {
     content: none !important;
   }

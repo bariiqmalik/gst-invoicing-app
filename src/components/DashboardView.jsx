@@ -133,8 +133,17 @@ export default function DashboardView({
         gap: '16px'
       }}>
         <div>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '3px 10px', borderRadius: '999px', background: 'var(--bg-subtle)', border: '1px solid var(--border)', fontSize: '11px', fontWeight: 700, color: 'var(--primary)', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', gap: '4px' }}>
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#499A13' }} title="#499A13" />
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#BBDC12' }} title="#BBDC12" />
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#8ECA3C' }} title="#8ECA3C" />
+              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#276F27' }} title="#276F27" />
+            </div>
+            <span>Verdant Spectrum Palette</span>
+          </div>
           <h1>GST Billing & Financial Workspace</h1>
-          <p style={{ color: 'var(--muted-text)', fontSize: '14px', marginTop: '6px' }}>
+          <p style={{ color: 'var(--muted-text)', fontSize: '14px', marginTop: '4px' }}>
             Real-time tax liability, receivables tracking, and CBIC-compliant GST overview.
           </p>
         </div>
@@ -156,10 +165,15 @@ export default function DashboardView({
           </button>
           <button 
             id="dashboard-new-invoice-btn"
-            className="btn btn-accent btn-sm"
+            className="btn btn-primary btn-sm"
             onClick={onOpenCreateInvoice}
+            style={{
+              background: 'linear-gradient(135deg, var(--palette-forest) 0%, var(--palette-green) 100%)',
+              fontWeight: 700,
+              boxShadow: '0 4px 14px rgba(39, 111, 39, 0.28)'
+            }}
           >
-            <Plus size={16} />
+            <Plus size={16} color="var(--palette-lime)" />
             <span>Create New Invoice</span>
           </button>
         </div>
@@ -193,15 +207,15 @@ export default function DashboardView({
             gap: '24px',
             marginBottom: '32px'
           }}>
-            {/* Metric 1: Revenue Collected */}
+            {/* Metric 1: Revenue Collected — Top band #499A13 */}
             <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'var(--secondary)' }} />
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'var(--palette-green)' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted-text)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
                     Collected Revenue
                   </div>
-                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--primary)', marginTop: '8px', letterSpacing: '-0.5px' }}>
+                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--palette-forest)', marginTop: '8px', letterSpacing: '-0.5px' }}>
                     {formatINR(metrics?.totalRevenue || 0)}
                   </div>
                 </div>
@@ -209,8 +223,8 @@ export default function DashboardView({
                   width: '44px',
                   height: '44px',
                   borderRadius: '12px',
-                  background: 'var(--secondary-subtle)',
-                  color: 'var(--secondary)',
+                  background: 'rgba(73, 154, 19, 0.12)',
+                  color: 'var(--palette-green)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -219,21 +233,21 @@ export default function DashboardView({
                   <IndianRupee size={22} />
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '16px', fontSize: '12px', color: 'var(--secondary)', fontWeight: 600 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '16px', fontSize: '12px', color: 'var(--palette-green)', fontWeight: 600 }}>
                 <TrendingUp size={14} />
                 <span>{statusCounts.Paid || 0} Fully settled invoices</span>
               </div>
             </div>
 
-            {/* Metric 2: Outstanding Receivables - SEMICOLON FIXED */}
+            {/* Metric 2: Outstanding Receivables — Second band #BBDC12 */}
             <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'var(--accent)' }} />
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'var(--palette-lime)' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted-text)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
                     Pending Receivables
                   </div>
-                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--primary)', marginTop: '8px', letterSpacing: '-0.5px' }}>
+                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--palette-forest)', marginTop: '8px', letterSpacing: '-0.5px' }}>
                     {formatINR(metrics?.totalOutstanding || 0)}
                   </div>
                 </div>
@@ -241,8 +255,8 @@ export default function DashboardView({
                   width: '44px',
                   height: '44px',
                   borderRadius: '12px',
-                  background: 'var(--accent-subtle)',
-                  color: 'var(--accent-dark)',
+                  background: 'rgba(187, 220, 18, 0.25)',
+                  color: 'var(--palette-forest)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -251,21 +265,21 @@ export default function DashboardView({
                   <Clock size={22} />
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '16px', fontSize: '12px', color: 'var(--accent-dark)', fontWeight: 600 }}>
-                <AlertCircle size={14} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '16px', fontSize: '12px', color: 'var(--muted-text)', fontWeight: 600 }}>
+                <AlertCircle size={14} color="var(--palette-forest)" />
                 <span>{statusCounts.Overdue || 0} Overdue • {statusCounts.Sent || 0} Awaiting Payment</span>
               </div>
             </div>
 
-            {/* Metric 3: GST Tax Collected with Breakup */}
+            {/* Metric 3: GST Tax Collected with Breakup — Fourth band #276F27 */}
             <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'var(--primary)' }} />
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'var(--palette-forest)' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted-text)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
                     GST Realized
                   </div>
-                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--primary)', marginTop: '8px', letterSpacing: '-0.5px' }}>
+                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--palette-forest)', marginTop: '8px', letterSpacing: '-0.5px' }}>
                     {formatINR(metrics?.totalTaxCollected || 0)}
                   </div>
                 </div>
@@ -273,8 +287,8 @@ export default function DashboardView({
                   width: '44px',
                   height: '44px',
                   borderRadius: '12px',
-                  background: 'var(--primary-subtle)',
-                  color: 'var(--primary)',
+                  background: 'rgba(39, 111, 39, 0.12)',
+                  color: 'var(--palette-forest)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -290,15 +304,15 @@ export default function DashboardView({
               </div>
             </div>
 
-            {/* Metric 4: Total Invoices and Status Split */}
+            {/* Metric 4: Total Invoices and Status Split — 4-Color Swatch Gradient */}
             <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(90deg, var(--primary), var(--secondary))' }} />
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '4px', background: 'linear-gradient(90deg, #499A13 0%, #BBDC12 33%, #8ECA3C 66%, #276F27 100%)' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div>
                   <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted-text)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
                     Total Invoices Issued
                   </div>
-                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--primary)', marginTop: '8px', letterSpacing: '-0.5px' }}>
+                  <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--palette-forest)', marginTop: '8px', letterSpacing: '-0.5px' }}>
                     {metrics?.totalInvoices || 0}
                   </div>
                 </div>
@@ -306,8 +320,8 @@ export default function DashboardView({
                   width: '44px',
                   height: '44px',
                   borderRadius: '12px',
-                  background: 'var(--bg-subtle)',
-                  color: 'var(--primary)',
+                  background: 'rgba(142, 202, 60, 0.15)',
+                  color: 'var(--palette-forest)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -359,10 +373,10 @@ export default function DashboardView({
                           maxWidth: '52px',
                           height: `${heightPct}px`,
                           background: m.revenue > 0 
-                            ? 'linear-gradient(180deg, var(--secondary-light) 0%, var(--secondary) 100%)' 
+                            ? 'linear-gradient(180deg, var(--palette-lime) 0%, var(--palette-green) 100%)' 
                             : 'var(--border)',
                           borderRadius: '6px 6px 2px 2px',
-                          boxShadow: m.revenue > 0 ? 'var(--shadow-sm)' : 'none',
+                          boxShadow: m.revenue > 0 ? '0 2px 8px rgba(73, 154, 19, 0.28)' : 'none',
                           transition: 'height 0.4s ease'
                         }} />
                         <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text)' }}>
@@ -440,7 +454,10 @@ export default function DashboardView({
                         fontSize: '12px',
                         padding: '6px 14px',
                         fontWeight: active ? 700 : 500,
-                        boxShadow: active ? '0 2px 6px rgba(18, 59, 93, 0.25)' : 'none'
+                        background: active ? 'var(--palette-forest)' : undefined,
+                        color: active ? '#FFFFFF' : undefined,
+                        borderColor: active ? 'var(--palette-lime)' : undefined,
+                        boxShadow: active ? '0 2px 8px rgba(39, 111, 39, 0.28)' : 'none'
                       }}
                     >
                       {status}
@@ -597,13 +614,13 @@ export default function DashboardView({
                                 display: 'inline-flex',
                                 alignItems: 'center',
                                 gap: '4px',
-                                background: 'var(--primary-subtle)',
-                                color: 'var(--primary)',
+                                background: 'rgba(39, 111, 39, 0.12)',
+                                color: 'var(--palette-forest)',
                                 fontSize: '11px',
                                 fontWeight: 700,
                                 padding: '3px 8px',
                                 borderRadius: '4px',
-                                border: '1px solid var(--info-border)'
+                                border: '1px solid rgba(39, 111, 39, 0.35)'
                               }}>
                                 🔵 IGST
                               </span>
@@ -612,13 +629,13 @@ export default function DashboardView({
                                 display: 'inline-flex',
                                 alignItems: 'center',
                                 gap: '4px',
-                                background: 'var(--secondary-subtle)',
-                                color: 'var(--secondary)',
+                                background: 'rgba(142, 202, 60, 0.18)',
+                                color: 'var(--palette-forest)',
                                 fontSize: '11px',
                                 fontWeight: 700,
                                 padding: '3px 8px',
                                 borderRadius: '4px',
-                                border: '1px solid var(--success-border)'
+                                border: '1px solid var(--palette-leaf)'
                               }}>
                                 🟢 CGST + SGST
                               </span>
@@ -763,7 +780,7 @@ export default function DashboardView({
           {/* GST Summary Metrics */}
           {gstSummary ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '24px', marginBottom: '32px' }}>
-              {/* Metric 1: Total Outward Taxable Value */}
+              {/* Metric 1: Total Outward Taxable Value — Apple Leaf #8ECA3C */}
               <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
                 <div style={{
                   position: 'absolute',
@@ -771,14 +788,14 @@ export default function DashboardView({
                   left: 0,
                   right: 0,
                   height: '4px',
-                  background: 'var(--secondary)'
+                  background: 'var(--palette-leaf)'
                 }} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
                     <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted-text)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
                       Total Outward Taxable Value
                     </div>
-                    <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--primary)', marginTop: '8px', letterSpacing: '-0.5px' }}>
+                    <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--palette-forest)', marginTop: '8px', letterSpacing: '-0.5px' }}>
                       {formatINR(gstSummary.totalOutwardTaxableValue || 0)}
                     </div>
                   </div>
@@ -786,8 +803,8 @@ export default function DashboardView({
                     width: '44px',
                     height: '44px',
                     borderRadius: '12px',
-                    background: 'var(--secondary-subtle)',
-                    color: 'var(--secondary)',
+                    background: 'rgba(142, 202, 60, 0.18)',
+                    color: 'var(--palette-forest)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -796,13 +813,13 @@ export default function DashboardView({
                     <IndianRupee size={22} />
                   </div>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '16px', fontSize: '12px', color: 'var(--secondary)', fontWeight: 600 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '16px', fontSize: '12px', color: 'var(--palette-green)', fontWeight: 600 }}>
                   <TrendingUp size={14} />
                   <span>{gstSummary.b2b?.count || 0} B2B • {gstSummary.b2c?.count || 0} B2C Invoices</span>
                 </div>
               </div>
 
-              {/* Metric 2: Total Tax Liability */}
+              {/* Metric 2: Total Tax Liability — Deep Forest #276F27 */}
               <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
                 <div style={{
                   position: 'absolute',
@@ -810,14 +827,14 @@ export default function DashboardView({
                   left: 0,
                   right: 0,
                   height: '4px',
-                  background: 'var(--primary)'
+                  background: 'var(--palette-forest)'
                 }} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
                     <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted-text)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
                       Net Output Tax Liability
                     </div>
-                    <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--primary)', marginTop: '8px', letterSpacing: '-0.5px' }}>
+                    <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--palette-forest)', marginTop: '8px', letterSpacing: '-0.5px' }}>
                       {formatINR(gstSummary.netOutputTaxLiability || 0)}
                     </div>
                   </div>
@@ -825,8 +842,8 @@ export default function DashboardView({
                     width: '44px',
                     height: '44px',
                     borderRadius: '12px',
-                    background: 'var(--primary-subtle)',
-                    color: 'var(--primary)',
+                    background: 'rgba(39, 111, 39, 0.12)',
+                    color: 'var(--palette-forest)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -842,7 +859,7 @@ export default function DashboardView({
                 </div>
               </div>
 
-              {/* Metric 3: B2B vs B2C Split */}
+              {/* Metric 3: B2B vs B2C Split — Electric Lime #BBDC12 */}
               <div className="card" style={{ position: 'relative', overflow: 'hidden' }}>
                 <div style={{
                   position: 'absolute',
@@ -850,14 +867,14 @@ export default function DashboardView({
                   left: 0,
                   right: 0,
                   height: '4px',
-                  background: 'var(--accent)'
+                  background: 'var(--palette-lime)'
                 }} />
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
                     <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted-text)', textTransform: 'uppercase', letterSpacing: '0.6px' }}>
                       B2B vs B2C Distribution
                     </div>
-                    <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--primary)', marginTop: '8px', letterSpacing: '-0.5px' }}>
+                    <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--palette-forest)', marginTop: '8px', letterSpacing: '-0.5px' }}>
                       {formatINR(gstSummary.b2b?.taxableValue || 0)} B2B | {formatINR(gstSummary.b2c?.taxableValue || 0)} B2C
                     </div>
                   </div>
@@ -865,8 +882,8 @@ export default function DashboardView({
                     width: '44px',
                     height: '44px',
                     borderRadius: '12px',
-                    background: 'var(--accent-subtle)',
-                    color: 'var(--accent-dark)',
+                    background: 'rgba(187, 220, 18, 0.25)',
+                    color: 'var(--palette-forest)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',

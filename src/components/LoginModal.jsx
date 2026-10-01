@@ -1,27 +1,21 @@
 import React, { useState } from 'react';
 import { 
   Lock, 
-  ShieldCheck, 
-  Shield,
+  Mail, 
   ArrowRight, 
   FileText, 
   AlertCircle, 
   Eye, 
   EyeOff, 
-  Mail, 
-  Sparkles,
-  Percent,
-  Receipt,
-  DownloadCloud,
-  Sun,
-  Moon,
-  Fingerprint,
-  CheckCircle2,
-  X
+  Sun, 
+  Moon, 
+  Fingerprint, 
+  ShieldCheck,
+  Zap
 } from 'lucide-react';
 import { GST_STATES, validateGSTIN } from '../utils/gstFrontendUtils';
 
-// Authentic Brand Icons
+// Minimalist Brand Icons for Social Logins
 const GoogleIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
     <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -31,56 +25,25 @@ const GoogleIcon = ({ size = 18 }) => (
   </svg>
 );
 
-const AppleIcon = ({ size = 18, color = "currentColor" }) => (
-  <svg width={size} height={size} viewBox="0 0 170 170" fill={color} xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+const AppleIcon = ({ size = 18 }) => (
+  <svg width={size} height={size} viewBox="0 0 170 170" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
     <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.69-3.04-7.6-7.77-11.74-14.19-6.09-9.5-10.97-20.3-14.65-32.4-3.68-12.1-5.52-23.75-5.52-34.95 0-14.2 3.65-26.06 10.96-35.59 7.3-9.52 16.48-14.38 27.53-14.59 4.36 0 9.25 1.15 14.67 3.45 5.43 2.3 9.2 3.51 11.33 3.63 1.94-.12 5.92-1.38 11.93-3.79 6.01-2.41 11.28-3.48 15.82-3.21 12.01.76 21.6 5.09 28.77 12.98-10.46 6.32-15.58 15.02-15.36 26.11.22 8.7 3.54 16.03 9.97 21.99 6.43 5.95 14.11 9.38 23.05 10.27-2.07 6.1-4.63 12.44-7.67 19.03zM119.22 33.3c0-7.29 2.59-14.07 7.77-20.34 5.18-6.27 11.75-10.59 19.7-12.96.22 1.3.33 2.45.33 3.46 0 7.29-2.73 14.23-8.19 20.82-5.46 6.59-12.16 10.74-20.1 12.46-.54-1.08-.81-2.23-.81-3.44z"/>
   </svg>
 );
 
-// Password strength evaluator matching Google & Apple Account Security standards
+// Password strength evaluator
 const calculatePasswordStrength = (pwd) => {
-  if (!pwd) {
-    return {
-      score: 0,
-      label: 'Too short',
-      color: 'var(--muted-text)',
-      percent: 0,
-      checks: { length: false, mixed: false, number: false, special: false }
-    };
-  }
-
-  const checks = {
-    length: pwd.length >= 8,
-    mixed: /[a-z]/.test(pwd) && /[A-Z]/.test(pwd),
-    number: /[0-9]/.test(pwd),
-    special: /[^A-Za-z0-9]/.test(pwd)
-  };
-
+  if (!pwd) return { score: 0, label: '', percent: 0, color: 'transparent' };
   let score = 0;
-  if (checks.length) score++;
-  if (checks.mixed) score++;
-  if (checks.number) score++;
-  if (checks.special) score++;
+  if (pwd.length >= 8) score++;
+  if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) score++;
+  if (/[0-9]/.test(pwd)) score++;
+  if (/[^A-Za-z0-9]/.test(pwd)) score++;
 
-  let label = 'Weak';
-  let color = '#EF4444'; // Red
-  let percent = 25;
-
-  if (score === 2) {
-    label = 'Fair';
-    color = '#F59E0B'; // Amber
-    percent = 50;
-  } else if (score === 3) {
-    label = 'Good';
-    color = '#3B82F6'; // Blue
-    percent = 75;
-  } else if (score === 4) {
-    label = 'Strong (Enterprise Grade)';
-    color = '#10B981'; // Emerald
-    percent = 100;
-  }
-
-  return { score, label, color, percent, checks };
+  if (score <= 1) return { score, label: 'Weak', percent: 25, color: '#EF4444' };
+  if (score === 2) return { score, label: 'Fair', percent: 50, color: '#F59E0B' };
+  if (score === 3) return { score, label: 'Good', percent: 75, color: '#8ECA3C' };
+  return { score, label: 'Strong', percent: 100, color: '#499A13' };
 };
 
 export default function LoginModal({ 
@@ -91,15 +54,15 @@ export default function LoginModal({
   theme = 'light', 
   onToggleTheme 
 }) {
-  const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
+  const [activeTab, setActiveTab] = useState('login'); // 'login' | 'register'
 
-  // Login State
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
+  // Login form state
+  const [loginEmail, setLoginEmail] = useState('owner@vanistudios.in');
+  const [loginPassword, setLoginPassword] = useState('Admin@12345');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
-  // Register State
+  // Register form state
   const [fullName, setFullName] = useState('');
   const [businessName, setBusinessName] = useState('');
   const [registerEmail, setRegisterEmail] = useState('');
@@ -107,55 +70,25 @@ export default function LoginModal({
   const [stateCode, setStateCode] = useState('27'); // Maharashtra default
   const [gstin, setGstin] = useState('');
   const [registerPassword, setRegisterPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
-  const [agreedTerms, setAgreedTerms] = useState(true);
 
-  // SSO & Security State
-  const [activeSsoModal, setActiveSsoModal] = useState(null); // 'google' | 'apple' | 'passkey' | null
-  const [customGoogleEmail, setCustomGoogleEmail] = useState('');
-  const [customGoogleName, setCustomGoogleName] = useState('');
-  const [showCustomGoogle, setShowCustomGoogle] = useState(false);
-  const [appleEmailType, setAppleEmailType] = useState('share'); // 'share' | 'hide'
-  const [passkeyPhase, setPasskeyPhase] = useState('scanning'); // 'scanning' | 'success'
-
-  // UI state
+  // Status & loading
   const [error, setError] = useState('');
-  const [gstinFeedback, setGstinFeedback] = useState({ valid: true, error: '' });
   const [isLoading, setIsLoading] = useState(false);
+  const [passkeyActive, setPasskeyActive] = useState(false);
 
   const pwdStrength = calculatePasswordStrength(registerPassword);
 
-  // Quick Demo fill
-  const handleFillDemo = () => {
+  // Fill demo credentials
+  const handleAutoFillDemo = () => {
     setActiveTab('login');
     setLoginEmail('owner@vanistudios.in');
     setLoginPassword('Admin@12345');
     setError('');
   };
 
-  // Validate GSTIN on type in registration
-  const handleGstinChange = (val) => {
-    const upper = val.toUpperCase().trim();
-    setGstin(upper);
-    const stripped = upper.replace(/[\s-]/g, '');
-    if (stripped.length >= 2) {
-      const code = stripped.substring(0, 2);
-      const stateObj = GST_STATES.find(s => s.code === code);
-      if (stateObj && stateCode !== code) {
-        setStateCode(code);
-      }
-    }
-    if (stripped) {
-      const res = validateGSTIN(stripped, stateCode);
-      setGstinFeedback(res);
-    } else {
-      setGstinFeedback({ valid: true, error: '' });
-    }
-  };
-
-  // Direct 1-Click Demo Login
-  const handleDirectDemoLogin = async () => {
+  // Instant 1-click Demo Login
+  const handleInstantDemoLogin = async () => {
     setActiveTab('login');
     setLoginEmail('owner@vanistudios.in');
     setLoginPassword('Admin@12345');
@@ -164,61 +97,61 @@ export default function LoginModal({
     try {
       await onLogin({ email: 'owner@vanistudios.in', password: 'Admin@12345' });
     } catch (err) {
-      setError(err.message || 'Demo login failed. Please verify server connection.');
+      setError(err.message || 'Demo login failed. Please ensure the server is running.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Handle Login
+  // Submit Login
   const handleLoginSubmit = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
     setError('');
-
     const email = loginEmail.trim();
     const pwd = loginPassword;
 
     if (!email) {
-      setError('Please enter your business owner email.');
+      setError('Please enter your business email.');
       return;
     }
     if (!pwd) {
-      setError('Please enter your password. For demo access, click "Auto-fill" or "Instant Demo Unlock" below.');
+      setError('Please enter your password.');
       return;
     }
 
     setIsLoading(true);
-
     try {
       await onLogin({ email, password: pwd });
     } catch (err) {
-      setError(err.message || 'Invalid email or password. Please check your credentials or click "Auto-fill" below.');
+      setError(err.message || 'Invalid credentials. Click "Instant Demo" to log in immediately.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Handle Register
+  // Submit Register
   const handleRegisterSubmit = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     setError('');
 
+    if (!fullName.trim()) {
+      setError('Please provide your full name.');
+      return;
+    }
+    if (!businessName.trim()) {
+      setError('Please provide your business legal name.');
+      return;
+    }
+    if (!registerEmail.trim()) {
+      setError('Please provide an email address.');
+      return;
+    }
     if (registerPassword.length < 6) {
-      setError('Password must be at least 6 characters long.');
+      setError('Password must contain at least 6 characters.');
       return;
     }
 
-    if (registerPassword !== confirmPassword) {
-      setError('Passwords do not match. Please verify your password.');
-      return;
-    }
-
-    if (!agreedTerms) {
-      setError('Please agree to the Terms of Service & GST Compliance Guidelines.');
-      return;
-    }
-
-    const strippedGstin = gstin.trim().replace(/[\s-]/g, '');
+    const strippedGstin = gstin.trim().replace(/[\s-]/g, '').toUpperCase();
     if (strippedGstin) {
       const res = validateGSTIN(strippedGstin, stateCode);
       if (!res.valid) {
@@ -239,28 +172,29 @@ export default function LoginModal({
           password: registerPassword,
           phone: phone.trim(),
           state: stateObj ? stateObj.name : 'Maharashtra',
-          stateCode: stateCode,
+          stateCode,
           gstin: strippedGstin
         });
       } else {
         await onLogin({ email: registerEmail.trim(), password: registerPassword });
       }
     } catch (err) {
-      setError(err.message || 'Failed to create business account.');
+      setError(err.message || 'Registration failed. Please check details.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Social SSO Executor
-  const handleExecuteSocialLogin = async (provider, email, name, businessName) => {
+  // Quick Social SSO
+  const handleSocialClick = async (provider) => {
     setError('');
     setIsLoading(true);
     try {
+      const name = provider === 'google' ? 'Google Workspace User' : 'Apple Enterprise User';
+      const email = provider === 'google' ? 'google.user@vanistudios.in' : 'apple.user@vanistudios.in';
       if (onSocialLogin) {
-        await onSocialLogin({ provider, email, name, businessName });
+        await onSocialLogin({ provider, email, name, businessName: 'Vani Studios Private Limited' });
       }
-      setActiveSsoModal(null);
     } catch (err) {
       setError(err.message || `${provider} authentication failed.`);
     } finally {
@@ -268,1508 +202,751 @@ export default function LoginModal({
     }
   };
 
-  // Passkey Biometric Executor
-  const handleExecutePasskey = async () => {
+  // Quick Passkey Biometric
+  const handlePasskeyClick = async () => {
     setError('');
-    setActiveSsoModal('passkey');
-    setPasskeyPhase('scanning');
-
-    setTimeout(async () => {
-      try {
-        if (onPasskeyLogin) {
-          await onPasskeyLogin({ email: loginEmail || 'owner@vanistudios.in' });
-        }
-        setPasskeyPhase('success');
-        setTimeout(() => setActiveSsoModal(null), 500);
-      } catch (err) {
-        setError(err.message || 'Passkey verification failed.');
-        setActiveSsoModal(null);
+    setPasskeyActive(true);
+    try {
+      if (onPasskeyLogin) {
+        await onPasskeyLogin({ email: loginEmail || 'owner@vanistudios.in' });
       }
-    }, 700);
+    } catch (err) {
+      setError(err.message || 'Passkey verification failed.');
+    } finally {
+      setPasskeyActive(false);
+    }
   };
 
   return (
     <div style={{
       minHeight: '100vh',
       display: 'flex',
-      alignItems: 'stretch',
-      background: 'var(--primary-dark)',
-      fontFamily: 'var(--font-sans)',
-      color: '#FFFFFF'
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'var(--background)',
+      position: 'relative',
+      padding: '24px 16px',
+      overflow: 'hidden'
     }}>
-
-      {/* LEFT COLUMN: Premium Brand Showcase & Security Highlights */}
+      
+      {/* Subtle organic background ambient glow using the palette */}
       <div style={{
-        flex: '1.1',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        padding: '50px 60px',
-        background: 'radial-gradient(ellipse at 25% 25%, rgba(152, 134, 134, 0.22) 0%, rgba(92, 78, 78, 0.35) 45%, #000000 100%)',
-        borderRight: '1px solid rgba(221, 227, 232, 0.12)',
-        position: 'relative',
-        overflow: 'hidden'
-      }}>
-        
-        {/* Subtle grid pattern background */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-          pointerEvents: 'none'
-        }} />
+        position: 'absolute',
+        top: '-15%',
+        right: '-10%',
+        width: '500px',
+        height: '500px',
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(187, 220, 18, 0.12) 0%, rgba(73, 154, 19, 0.04) 60%, transparent 80%)',
+        filter: 'blur(60px)',
+        pointerEvents: 'none'
+      }} />
 
-        {/* Brand Header */}
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '12px',
-              background: 'var(--gothic-espresso)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 8px 20px rgba(0, 0, 0, 0.35)'
-            }}>
-              <FileText size={24} color="var(--gothic-light)" />
-            </div>
-            <div>
-              <div style={{
-                fontFamily: 'var(--font-display)',
-                fontSize: '24px',
-                fontWeight: 800,
-                letterSpacing: '-0.5px',
-                color: '#FFFFFF'
-              }}>
-                BillGST<span style={{ color: 'var(--accent)' }}>.Pro</span>
-              </div>
-              <div style={{ fontSize: '11px', color: '#DDE3E8', letterSpacing: '0.8px', textTransform: 'uppercase', fontWeight: 600 }}>
-                Enterprise Indian GST Invoicing Workspace
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Hero Narrative & Features */}
-        <div style={{ position: 'relative', zIndex: 1, margin: '30px 0' }}>
-          
-          <div style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '6px 14px',
-            borderRadius: '9999px',
-            background: 'rgba(230, 162, 60, 0.15)',
-            border: '1px solid rgba(230, 162, 60, 0.35)',
-            color: 'var(--accent-light)',
-            fontSize: '12px',
-            fontWeight: 700,
-            marginBottom: '16px'
-          }}>
-            <Sparkles size={14} />
-            <span>Built for Indian Freelancers, Agencies & Small Businesses</span>
-          </div>
-
-          <h1 style={{
-            fontSize: '34px',
-            fontWeight: 800,
-            lineHeight: 1.2,
-            letterSpacing: '-0.8px',
-            color: '#FFFFFF',
-            marginBottom: '14px'
-          }}>
-            GST compliance simplified.<br />
-            <span style={{ color: 'var(--accent)' }}>
-              Zero calculation headaches.
-            </span>
-          </h1>
-
-          <p style={{ fontSize: '14px', color: '#CBD5E1', lineHeight: 1.6, maxWidth: '520px', marginBottom: '24px' }}>
-            Issue CBIC-compliant tax invoices with automatic CGST, SGST, and IGST tax determination, verified HSN/SAC lookups, and instant branded PDF generation.
-          </p>
-
-          {/* Feature Highlights Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', maxWidth: '560px' }}>
-            
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '12px',
-              padding: '14px',
-              backdropFilter: 'blur(8px)'
-            }}>
-              <div style={{ color: 'var(--accent)', marginBottom: '6px' }}>
-                <Percent size={18} />
-              </div>
-              <div style={{ fontWeight: 700, fontSize: '13px', color: '#FFFFFF' }}>Auto Intra/Inter-State</div>
-              <div style={{ fontSize: '12px', color: '#CBD5E1', marginTop: '2px' }}>
-                Detects buyer vs seller state codes and splits CGST+SGST or applies IGST instantly.
-              </div>
-            </div>
-
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '12px',
-              padding: '14px',
-              backdropFilter: 'blur(8px)'
-            }}>
-              <div style={{ color: 'var(--secondary-light)', marginBottom: '6px' }}>
-                <Receipt size={18} />
-              </div>
-              <div style={{ fontWeight: 700, fontSize: '13px', color: '#FFFFFF' }}>Strict HSN/SAC Checks</div>
-              <div style={{ fontSize: '12px', color: '#CBD5E1', marginTop: '2px' }}>
-                Strong validation of 4/6/8-digit Goods HSN & 6-digit Services SAC codes before issuance.
-              </div>
-            </div>
-
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '12px',
-              padding: '14px',
-              backdropFilter: 'blur(8px)'
-            }}>
-              <div style={{ color: '#38BDF8', marginBottom: '6px' }}>
-                <DownloadCloud size={18} />
-              </div>
-              <div style={{ fontWeight: 700, fontSize: '13px', color: '#FFFFFF' }}>Branded A4 PDF Engine</div>
-              <div style={{ fontSize: '12px', color: '#CBD5E1', marginTop: '2px' }}>
-                Includes official GST HSN summary tables, bank remittance details, and signature seals.
-              </div>
-            </div>
-
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '12px',
-              padding: '14px',
-              backdropFilter: 'blur(8px)'
-            }}>
-              <div style={{ color: '#34D399', marginBottom: '6px' }}>
-                <ShieldCheck size={18} />
-              </div>
-              <div style={{ fontWeight: 700, fontSize: '13px', color: '#FFFFFF' }}>Google & Apple Security</div>
-              <div style={{ fontSize: '12px', color: '#CBD5E1', marginTop: '2px' }}>
-                Biometric Passkeys, OAuth 2.0 Single Sign-On, and 256-Bit TLS encryption.
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* Footer Trust Seal */}
-        <div style={{ position: 'relative', zIndex: 1, borderTop: '1px solid rgba(255, 255, 255, 0.1)', paddingTop: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px', color: '#94A3B8' }}>
-            <span>Compliant with CBIC GST E-Invoicing Formats</span>
-            <span>All 37 States & UTs Supported</span>
-          </div>
-        </div>
-
-      </div>
-
-      {/* RIGHT COLUMN: Interactive Sign In / Register Portal */}
       <div style={{
-        flex: '1',
+        position: 'absolute',
+        bottom: '-15%',
+        left: '-10%',
+        width: '550px',
+        height: '550px',
+        borderRadius: '50%',
+        background: 'radial-gradient(circle, rgba(39, 111, 39, 0.15) 0%, rgba(142, 202, 60, 0.05) 60%, transparent 80%)',
+        filter: 'blur(70px)',
+        pointerEvents: 'none'
+      }} />
+
+      {/* Top Bar: Theme Toggle & Status */}
+      <div style={{
+        position: 'absolute',
+        top: '20px',
+        right: '24px',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        padding: '30px 24px',
-        position: 'relative',
-        background: theme === 'dark' ? '#000000' : '#D1D0D0',
-        overflowY: 'auto'
+        gap: '12px',
+        zIndex: 10
       }}>
-
-        {/* Floating Theme Toggle Switcher */}
         {onToggleTheme && (
           <button
             type="button"
             onClick={onToggleTheme}
-            id="theme-toggle-login"
-            aria-label="Toggle visual theme"
             style={{
-              position: 'absolute',
-              top: '20px',
-              right: '24px',
-              display: 'inline-flex',
+              background: 'var(--cards)',
+              border: '1px solid var(--border)',
+              borderRadius: '999px',
+              padding: '6px 12px',
+              display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              padding: '6px 12px',
-              borderRadius: '20px',
-              background: theme === 'dark' ? 'rgba(255, 255, 255, 0.12)' : '#FFFFFF',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid var(--border)',
-              color: 'var(--text)',
               cursor: 'pointer',
+              color: 'var(--text)',
               fontSize: '12px',
               fontWeight: 600,
-              zIndex: 10,
               boxShadow: 'var(--shadow-sm)',
               transition: 'all 0.2s ease'
             }}
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label="Toggle theme"
           >
             {theme === 'dark' ? (
               <>
-                <Sun size={14} style={{ color: '#FBBF24' }} />
-                <span>Light Mode</span>
+                <Sun size={14} color="var(--palette-lime)" />
+                <span>Light</span>
               </>
             ) : (
               <>
-                <Moon size={14} style={{ color: 'var(--primary)' }} />
-                <span>Dark Mode</span>
+                <Moon size={14} color="var(--palette-forest)" />
+                <span>Dark</span>
               </>
             )}
           </button>
         )}
-        
-        <div style={{
-          width: '100%',
-          maxWidth: '510px',
-          background: 'var(--cards)',
-          borderRadius: 'var(--radius-xl)',
-          boxShadow: 'var(--shadow-xl)',
-          overflow: 'hidden',
-          color: 'var(--text)',
-          border: '1px solid var(--border)',
-          margin: '20px 0'
-        }}>
+      </div>
 
-          {/* Tab Switcher */}
+      {/* Main Minimalist Login Card */}
+      <div style={{
+        width: '100%',
+        maxWidth: '440px',
+        background: 'var(--cards)',
+        border: '1px solid var(--border)',
+        borderRadius: '20px',
+        boxShadow: 'var(--shadow-xl)',
+        overflow: 'hidden',
+        position: 'relative',
+        zIndex: 5,
+        animation: 'fadeIn 0.25s ease-out'
+      }}>
+
+        {/* ── Top 4-Color Swatch Accent Band (User Swatch: #499A13, #BBDC12, #8ECA3C, #276F27) ── */}
+        <div style={{ display: 'flex', height: '5px', width: '100%' }}>
+          <div style={{ flex: 1, background: '#499A13' }} title="#499A13 (Meadow Green)" />
+          <div style={{ flex: 1, background: '#BBDC12' }} title="#BBDC12 (Electric Lime)" />
+          <div style={{ flex: 1, background: '#8ECA3C' }} title="#8ECA3C (Apple Leaf)" />
+          <div style={{ flex: 1, background: '#276F27' }} title="#276F27 (Deep Forest)" />
+        </div>
+
+        {/* Card Content with Breathing Room */}
+        <div style={{ padding: '36px 32px 32px 32px' }}>
+          
+          {/* Minimal Brand Header */}
+          <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+            <div style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '48px',
+              height: '48px',
+              borderRadius: '14px',
+              background: 'linear-gradient(135deg, var(--palette-forest) 0%, var(--palette-green) 100%)',
+              color: '#FFFFFF',
+              boxShadow: '0 6px 16px rgba(39, 111, 39, 0.25)',
+              marginBottom: '14px',
+              position: 'relative'
+            }}>
+              <FileText size={24} color="#FFFFFF" />
+              {/* Luminous Lime dot accent */}
+              <div style={{
+                position: 'absolute',
+                top: '-2px',
+                right: '-2px',
+                width: '10px',
+                height: '10px',
+                borderRadius: '50%',
+                background: 'var(--palette-lime)',
+                boxShadow: '0 0 8px var(--palette-lime)'
+              }} />
+            </div>
+
+            <h1 style={{
+              fontSize: '22px',
+              fontWeight: 800,
+              color: 'var(--text)',
+              letterSpacing: '-0.3px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px'
+            }}>
+              <span>BillGST</span>
+              <span style={{
+                fontSize: '11px',
+                fontWeight: 800,
+                background: 'var(--palette-lime)',
+                color: '#142914',
+                padding: '2px 7px',
+                borderRadius: '6px',
+                letterSpacing: '0.4px',
+                textTransform: 'uppercase'
+              }}>
+                PRO
+              </span>
+            </h1>
+
+            <p style={{
+              fontSize: '13px',
+              color: 'var(--muted-text)',
+              marginTop: '4px',
+              fontWeight: 500
+            }}>
+              CBIC-Compliant Indian GST Tax Invoicing
+            </p>
+          </div>
+
+          {/* Minimal Tab Switcher (Sign In vs Register) */}
           <div style={{
             display: 'flex',
-            borderBottom: '1px solid var(--border)',
-            background: 'var(--bg-subtle)'
+            background: 'var(--bg-subtle)',
+            padding: '4px',
+            borderRadius: '10px',
+            marginBottom: '22px',
+            border: '1px solid var(--border)'
           }}>
             <button
-              id="tab-signin"
               type="button"
               onClick={() => { setActiveTab('login'); setError(''); }}
               style={{
                 flex: 1,
-                padding: '16px',
-                fontSize: '14px',
-                fontWeight: 700,
+                padding: '8px 12px',
+                fontSize: '13px',
+                fontWeight: activeTab === 'login' ? 700 : 500,
                 color: activeTab === 'login' ? 'var(--primary)' : 'var(--muted-text)',
                 background: activeTab === 'login' ? 'var(--cards)' : 'transparent',
+                borderRadius: '7px',
                 border: 'none',
-                borderBottom: activeTab === 'login' ? '2px solid var(--secondary)' : '2px solid transparent',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                boxShadow: activeTab === 'login' ? 'var(--shadow-sm)' : 'none',
+                transition: 'all 0.15s ease'
               }}
             >
-              Sign In to Workspace
+              Sign In
             </button>
             <button
-              id="tab-register"
               type="button"
               onClick={() => { setActiveTab('register'); setError(''); }}
               style={{
                 flex: 1,
-                padding: '16px',
-                fontSize: '14px',
-                fontWeight: 700,
+                padding: '8px 12px',
+                fontSize: '13px',
+                fontWeight: activeTab === 'register' ? 700 : 500,
                 color: activeTab === 'register' ? 'var(--primary)' : 'var(--muted-text)',
                 background: activeTab === 'register' ? 'var(--cards)' : 'transparent',
+                borderRadius: '7px',
                 border: 'none',
-                borderBottom: activeTab === 'register' ? '2px solid var(--secondary)' : '2px solid transparent',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                boxShadow: activeTab === 'register' ? 'var(--shadow-sm)' : 'none',
+                transition: 'all 0.15s ease'
               }}
             >
-              Create Business Account
+              Create Account
             </button>
           </div>
 
-          <div style={{ padding: '28px 30px' }}>
-            
-            {/* Error Message */}
-            {error && (
-              <div style={{
-                background: 'var(--danger-light)',
-                border: '1px solid var(--danger-border)',
-                borderRadius: 'var(--radius-md)',
-                padding: '12px 14px',
-                fontSize: '13px',
-                color: 'var(--danger)',
-                marginBottom: '18px',
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '8px'
-              }}>
-                <AlertCircle size={16} style={{ marginTop: '2px', flexShrink: 0 }} />
-                <span>{error}</span>
-              </div>
-            )}
-
-            {/* TAB 1: SIGN IN FORM */}
-            {activeTab === 'login' && (
-              <div>
-                <div style={{ marginBottom: '18px' }}>
-                  <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--primary)' }}>
-                    Welcome back
-                  </h2>
-                  <p style={{ fontSize: '13px', color: 'var(--muted-text)', marginTop: '2px' }}>
-                    Access your single-business invoicing dashboard
-                  </p>
-                </div>
-
-                {/* Google & Apple Single Sign-On Buttons */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
-                  <button
-                    id="google-sso-btn"
-                    type="button"
-                    onClick={() => setActiveSsoModal('google')}
-                    disabled={isLoading}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      padding: '10px 12px',
-                      borderRadius: 'var(--radius-md)',
-                      background: theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#FFFFFF',
-                      border: '1px solid var(--border)',
-                      color: 'var(--text)',
-                      fontWeight: 600,
-                      fontSize: '13px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      boxShadow: 'var(--shadow-sm)'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--secondary)'}
-                    onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
-                  >
-                    <GoogleIcon size={18} />
-                    <span>Google</span>
-                  </button>
-
-                  <button
-                    id="apple-sso-btn"
-                    type="button"
-                    onClick={() => setActiveSsoModal('apple')}
-                    disabled={isLoading}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      padding: '10px 12px',
-                      borderRadius: 'var(--radius-md)',
-                      background: theme === 'dark' ? '#000000' : '#111827',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      color: '#FFFFFF',
-                      fontWeight: 600,
-                      fontSize: '13px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      boxShadow: 'var(--shadow-sm)'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.opacity = '0.92'}
-                    onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-                  >
-                    <AppleIcon size={17} color="#FFFFFF" />
-                    <span>Apple</span>
-                  </button>
-                </div>
-
-                {/* Biometric Passkey / Touch ID button */}
-                <button
-                  id="passkey-login-btn"
-                  type="button"
-                  onClick={handleExecutePasskey}
-                  disabled={isLoading}
-                  style={{
-                    width: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    padding: '9px 12px',
-                    borderRadius: 'var(--radius-md)',
-                    background: 'var(--bg-subtle)',
-                    border: '1px dashed var(--secondary)',
-                    color: 'var(--secondary)',
-                    fontWeight: 700,
-                    fontSize: '12px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    marginBottom: '16px'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.background = 'var(--secondary-subtle)'}
-                  onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-subtle)'}
-                >
-                  <Fingerprint size={16} />
-                  <span>Sign in with Biometrics / Touch ID / Passkey</span>
-                  <span style={{
-                    fontSize: '9px',
-                    padding: '2px 5px',
-                    background: 'var(--secondary)',
-                    color: '#FFFFFF',
-                    borderRadius: '4px',
-                    fontWeight: 800,
-                    letterSpacing: '0.4px'
-                  }}>
-                    FIDO2
-                  </span>
-                </button>
-
-                {/* Divider */}
-                <div style={{ display: 'flex', alignItems: 'center', margin: '14px 0 18px', gap: '10px' }}>
-                  <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
-                  <span style={{ fontSize: '11px', color: 'var(--muted-text)', textTransform: 'uppercase', letterSpacing: '0.6px', fontWeight: 600 }}>
-                    Or continue with email
-                  </span>
-                  <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
-                </div>
-
-                <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                  
-                  <div className="form-group" style={{ margin: 0 }}>
-                    <label className="form-label">Business Owner Email</label>
-                    <div style={{ position: 'relative' }}>
-                      <Mail size={16} color="var(--muted-text)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
-                      <input
-                        id="login-email-input"
-                        type="email"
-                        className="form-control"
-                        placeholder="owner@vanistudios.in"
-                        value={loginEmail}
-                        onChange={(e) => setLoginEmail(e.target.value)}
-                        required
-                        style={{ paddingLeft: '36px' }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-group" style={{ margin: 0 }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <label className="form-label" style={{ margin: 0 }}>Password</label>
-                      <span style={{ fontSize: '12px', color: 'var(--accent-dark)', cursor: 'pointer', fontWeight: 600 }} onClick={handleFillDemo}>
-                        Forgot password?
-                      </span>
-                    </div>
-                    <div style={{ position: 'relative' }}>
-                      <Lock size={16} color="var(--muted-text)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
-                      <input
-                        id="login-password-input"
-                        type={showLoginPassword ? 'text' : 'password'}
-                        className="form-control"
-                        placeholder="••••••••"
-                        value={loginPassword}
-                        onChange={(e) => setLoginPassword(e.target.value)}
-                        autoComplete="current-password"
-                        required
-                        style={{ paddingLeft: '36px', paddingRight: '36px' }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowLoginPassword(!showLoginPassword)}
-                        style={{
-                          position: 'absolute',
-                          right: '10px',
-                          top: '50%',
-                          transform: 'translateY(-50%)',
-                          background: 'transparent',
-                          border: 'none',
-                          cursor: 'pointer',
-                          color: 'var(--muted-text)'
-                        }}
-                        aria-label="Toggle password visibility"
-                      >
-                        {showLoginPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                      <input
-                        type="checkbox"
-                        checked={rememberMe}
-                        onChange={(e) => setRememberMe(e.target.checked)}
-                        style={{ cursor: 'pointer', width: '15px', height: '15px' }}
-                      />
-                      <span style={{ color: 'var(--text)' }}>Keep me signed in</span>
-                    </label>
-                  </div>
-
-                  <button
-                    id="submit-login-btn"
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={isLoading}
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      fontSize: '15px',
-                      fontWeight: 700,
-                      marginTop: '4px'
-                    }}
-                  >
-                    <span>{isLoading ? 'Authenticating...' : 'Unlock Workspace'}</span>
-                    <ArrowRight size={16} />
-                  </button>
-
-                </form>
-
-                {/* Quick Auto-fill Demo Box */}
-                <div style={{
-                  marginTop: '18px',
-                  background: 'var(--accent-subtle)',
-                  border: '1px dashed var(--warning-border)',
-                  borderRadius: 'var(--radius-md)',
-                  padding: '12px 14px',
-                  fontSize: '12px',
-                  color: 'var(--accent-dark)'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <span style={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <ShieldCheck size={14} color="var(--accent-dark)" />
-                      Demo Owner Workspace
-                    </span>
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                      <button
-                        id="autofill-demo-btn"
-                        type="button"
-                        className="btn btn-sm"
-                        onClick={handleFillDemo}
-                        style={{
-                          background: 'var(--cards)',
-                          color: 'var(--accent-dark)',
-                          border: '1px solid var(--warning-border)',
-                          padding: '3px 8px',
-                          fontSize: '11px',
-                          fontWeight: 700
-                        }}
-                      >
-                        Auto-fill
-                      </button>
-                      <button
-                        id="instant-demo-unlock-btn"
-                        type="button"
-                        className="btn btn-sm"
-                        disabled={isLoading}
-                        onClick={handleDirectDemoLogin}
-                        style={{
-                          background: 'var(--accent)',
-                          color: '#FFFFFF',
-                          border: 'none',
-                          padding: '3px 9px',
-                          fontSize: '11px',
-                          fontWeight: 700,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        1-Click Unlock →
-                      </button>
-                    </div>
-                  </div>
-                  <div>Email: <strong style={{ fontFamily: 'monospace' }}>owner@vanistudios.in</strong></div>
-                  <div>Password: <strong style={{ fontFamily: 'monospace' }}>Admin@12345</strong></div>
-                </div>
-
-                <div style={{ textAlign: 'center', marginTop: '16px', fontSize: '13px', color: 'var(--muted-text)' }}>
-                  Don't have a workspace yet?{' '}
-                  <span
-                    onClick={() => { setActiveTab('register'); setError(''); }}
-                    style={{ color: 'var(--secondary)', fontWeight: 700, cursor: 'pointer' }}
-                  >
-                    Create an account
-                  </span>
-                </div>
-
-              </div>
-            )}
-
-            {/* TAB 2: CREATE BUSINESS ACCOUNT FORM */}
-            {activeTab === 'register' && (
-              <div>
-                <div style={{ marginBottom: '16px' }}>
-                  <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--primary)' }}>
-                    Set up your GST workspace
-                  </h2>
-                  <p style={{ fontSize: '13px', color: 'var(--muted-text)', marginTop: '2px' }}>
-                    Register your business entity and configure state GST parameters
-                  </p>
-                </div>
-
-                {/* Google & Apple Single Sign-On for Registration */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
-                  <button
-                    id="register-google-sso-btn"
-                    type="button"
-                    onClick={() => setActiveSsoModal('google')}
-                    disabled={isLoading}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      padding: '10px 12px',
-                      borderRadius: 'var(--radius-md)',
-                      background: theme === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#FFFFFF',
-                      border: '1px solid var(--border)',
-                      color: 'var(--text)',
-                      fontWeight: 600,
-                      fontSize: '13px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      boxShadow: 'var(--shadow-sm)'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--secondary)'}
-                    onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
-                  >
-                    <GoogleIcon size={18} />
-                    <span>Sign up with Google</span>
-                  </button>
-
-                  <button
-                    id="register-apple-sso-btn"
-                    type="button"
-                    onClick={() => setActiveSsoModal('apple')}
-                    disabled={isLoading}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '8px',
-                      padding: '10px 12px',
-                      borderRadius: 'var(--radius-md)',
-                      background: theme === 'dark' ? '#000000' : '#111827',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      color: '#FFFFFF',
-                      fontWeight: 600,
-                      fontSize: '13px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      boxShadow: 'var(--shadow-sm)'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.opacity = '0.92'}
-                    onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-                  >
-                    <AppleIcon size={17} color="#FFFFFF" />
-                    <span>Sign up with Apple</span>
-                  </button>
-                </div>
-
-                {/* Divider */}
-                <div style={{ display: 'flex', alignItems: 'center', margin: '12px 0 16px', gap: '10px' }}>
-                  <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
-                  <span style={{ fontSize: '11px', color: 'var(--muted-text)', textTransform: 'uppercase', letterSpacing: '0.6px', fontWeight: 600 }}>
-                    Or register business details
-                  </span>
-                  <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
-                </div>
-
-                <form onSubmit={handleRegisterSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  
-                  {/* Full Name & Business Name */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                    <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label">Full Name *</label>
-                      <input
-                        id="register-fullname-input"
-                        type="text"
-                        className="form-control"
-                        placeholder="Rohan Sharma"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value)}
-                        required
-                        style={{ fontSize: '13px' }}
-                      />
-                    </div>
-
-                    <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label">Business / Agency Name *</label>
-                      <input
-                        id="register-bizname-input"
-                        type="text"
-                        className="form-control"
-                        placeholder="Acme Digital Studio"
-                        value={businessName}
-                        onChange={(e) => setBusinessName(e.target.value)}
-                        required
-                        style={{ fontSize: '13px' }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Business Email & Phone */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '10px' }}>
-                    <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label">Work Email *</label>
-                      <input
-                        id="register-email-input"
-                        type="email"
-                        className="form-control"
-                        placeholder="rohan@acmestudio.in"
-                        value={registerEmail}
-                        onChange={(e) => setRegisterEmail(e.target.value)}
-                        required
-                        style={{ fontSize: '13px' }}
-                      />
-                    </div>
-
-                    <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label">Mobile Number</label>
-                      <input
-                        id="register-phone-input"
-                        type="tel"
-                        className="form-control"
-                        placeholder="+91 98200 00000"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        style={{ fontSize: '13px' }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Registered State & State Code */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '10px' }}>
-                    <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label">Registered State (GST Code) *</label>
-                      <select
-                        id="register-state-select"
-                        className="form-control"
-                        value={stateCode}
-                        onChange={(e) => {
-                          setStateCode(e.target.value);
-                          if (gstin) handleGstinChange(gstin);
-                        }}
-                        style={{ fontSize: '13px', padding: '8px' }}
-                      >
-                        {GST_STATES.map(s => (
-                          <option key={s.code} value={s.code}>
-                            {s.code} - {s.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label">
-                        <span>GSTIN</span>
-                        <span className="form-hint">Optional</span>
-                      </label>
-                      <input
-                        id="register-gstin-input"
-                        type="text"
-                        className={`form-control ${gstin && !gstinFeedback.valid ? 'is-invalid' : ''}`}
-                        placeholder="27AABCV1234F1Z8"
-                        value={gstin}
-                        onChange={(e) => handleGstinChange(e.target.value)}
-                        style={{ fontSize: '13px', fontFamily: 'monospace' }}
-                      />
-                    </div>
-                  </div>
-
-                  {gstin && !gstinFeedback.valid && (
-                    <div style={{ fontSize: '11px', color: 'var(--danger)', marginTop: '-6px' }}>
-                      {gstinFeedback.error}
-                    </div>
-                  )}
-
-                  {/* Password & Confirm */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                    <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label">Password *</label>
-                      <input
-                        id="register-password-input"
-                        type={showRegisterPassword ? 'text' : 'password'}
-                        className="form-control"
-                        placeholder="••••••••"
-                        value={registerPassword}
-                        onChange={(e) => setRegisterPassword(e.target.value)}
-                        required
-                        style={{ fontSize: '13px' }}
-                      />
-                    </div>
-
-                    <div className="form-group" style={{ margin: 0 }}>
-                      <label className="form-label">Confirm Password *</label>
-                      <input
-                        id="register-confirmpass-input"
-                        type={showRegisterPassword ? 'text' : 'password'}
-                        className="form-control"
-                        placeholder="••••••••"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                        style={{ fontSize: '13px' }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* GOOGLE & APPLE STYLE PASSWORD SECURITY STRENGTH METER */}
-                  {registerPassword && (
-                    <div style={{
-                      background: 'var(--bg-subtle)',
-                      borderRadius: 'var(--radius-md)',
-                      padding: '10px 12px',
-                      border: '1px solid var(--border)'
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                        <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted-text)', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <Shield size={12} color={pwdStrength.color} />
-                          Security Level:
-                        </span>
-                        <span style={{ fontSize: '11px', fontWeight: 800, color: pwdStrength.color }}>
-                          {pwdStrength.label}
-                        </span>
-                      </div>
-
-                      {/* Animated Progress Bar */}
-                      <div style={{
-                        height: '5px',
-                        width: '100%',
-                        background: 'rgba(0, 0, 0, 0.08)',
-                        borderRadius: '10px',
-                        overflow: 'hidden',
-                        marginBottom: '8px'
-                      }}>
-                        <div style={{
-                          height: '100%',
-                          width: `${pwdStrength.percent}%`,
-                          background: pwdStrength.color,
-                          borderRadius: '10px',
-                          transition: 'width 0.3s ease, background 0.3s ease'
-                        }} />
-                      </div>
-
-                      {/* Real-time Checklist Chips */}
-                      <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
-                        gap: '6px',
-                        fontSize: '11px'
-                      }}>
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '5px',
-                          color: pwdStrength.checks.length ? '#10B981' : 'var(--muted-text)'
-                        }}>
-                          <CheckCircle2 size={12} style={{ opacity: pwdStrength.checks.length ? 1 : 0.4 }} />
-                          <span>8+ Characters</span>
-                        </div>
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '5px',
-                          color: pwdStrength.checks.mixed ? '#10B981' : 'var(--muted-text)'
-                        }}>
-                          <CheckCircle2 size={12} style={{ opacity: pwdStrength.checks.mixed ? 1 : 0.4 }} />
-                          <span>Upper & Lowercase</span>
-                        </div>
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '5px',
-                          color: pwdStrength.checks.number ? '#10B981' : 'var(--muted-text)'
-                        }}>
-                          <CheckCircle2 size={12} style={{ opacity: pwdStrength.checks.number ? 1 : 0.4 }} />
-                          <span>At least 1 Number</span>
-                        </div>
-                        <div style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '5px',
-                          color: pwdStrength.checks.special ? '#10B981' : 'var(--muted-text)'
-                        }}>
-                          <CheckCircle2 size={12} style={{ opacity: pwdStrength.checks.special ? 1 : 0.4 }} />
-                          <span>Special Symbol (!@#$)</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Show Password Toggle */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px' }}>
-                    <button
-                      type="button"
-                      onClick={() => setShowRegisterPassword(!showRegisterPassword)}
-                      style={{
-                        background: 'transparent',
-                        border: 'none',
-                        cursor: 'pointer',
-                        color: 'var(--muted-text)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px'
-                      }}
-                    >
-                      {showRegisterPassword ? <EyeOff size={13} /> : <Eye size={13} />}
-                      <span>{showRegisterPassword ? 'Hide password' : 'Show password'}</span>
-                    </button>
-                  </div>
-
-                  {/* Terms */}
-                  <div style={{ fontSize: '12px', color: 'var(--text)' }}>
-                    <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', cursor: 'pointer' }}>
-                      <input
-                        type="checkbox"
-                        checked={agreedTerms}
-                        onChange={(e) => setAgreedTerms(e.target.checked)}
-                        style={{ marginTop: '2px', cursor: 'pointer', width: '14px', height: '14px' }}
-                      />
-                      <span>
-                        I agree to the Terms of Service & certify business details are accurate for Indian GST invoicing.
-                      </span>
-                    </label>
-                  </div>
-
-                  <button
-                    id="submit-register-btn"
-                    type="submit"
-                    className="btn btn-accent"
-                    disabled={isLoading}
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      fontSize: '15px',
-                      fontWeight: 700,
-                      marginTop: '4px'
-                    }}
-                  >
-                    <span>{isLoading ? 'Creating Workspace...' : 'Create Business Workspace'}</span>
-                    <ArrowRight size={16} />
-                  </button>
-
-                </form>
-
-                <div style={{ textAlign: 'center', marginTop: '16px', fontSize: '13px', color: 'var(--muted-text)' }}>
-                  Already have an existing workspace?{' '}
-                  <span
-                    onClick={() => { setActiveTab('login'); setError(''); }}
-                    style={{ color: 'var(--secondary)', fontWeight: 700, cursor: 'pointer' }}
-                  >
-                    Sign In
-                  </span>
-                </div>
-
-              </div>
-            )}
-
-            {/* Enterprise Security Badges matching Google & Apple Standards */}
+          {/* Inline Error Alert */}
+          {error && (
             <div style={{
-              marginTop: '20px',
-              paddingTop: '16px',
-              borderTop: '1px solid var(--border)',
               display: 'flex',
-              justifyContent: 'center',
               alignItems: 'center',
-              gap: '14px',
-              flexWrap: 'wrap',
-              fontSize: '11px',
-              color: 'var(--muted-text)'
+              gap: '8px',
+              padding: '10px 14px',
+              borderRadius: '8px',
+              background: 'var(--danger-light)',
+              border: '1px solid var(--danger-border)',
+              color: 'var(--danger)',
+              fontSize: '12px',
+              marginBottom: '18px',
+              lineHeight: 1.4
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <Lock size={12} color="var(--secondary)" />
-                <span>256-Bit TLS Bank Grade</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <ShieldCheck size={12} color="var(--secondary)" />
-                <span>Google & Apple Verified</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <Shield size={12} color="var(--secondary)" />
-                <span>DPDP & CBIC GST Ready</span>
-              </div>
+              <AlertCircle size={15} style={{ flexShrink: 0 }} />
+              <span style={{ flex: 1 }}>{error}</span>
             </div>
+          )}
 
+          {/* ═════════ TAB 1: MINIMALIST SIGN IN ═════════ */}
+          {activeTab === 'login' && (
+            <form onSubmit={handleLoginSubmit}>
+              
+              {/* Email Input */}
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: 'var(--text)',
+                  marginBottom: '6px'
+                }}>
+                  Business Email
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <Mail size={16} color="var(--muted-text)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                  <input
+                    type="email"
+                    required
+                    value={loginEmail}
+                    onChange={(e) => setLoginEmail(e.target.value)}
+                    placeholder="name@company.in"
+                    className="form-control"
+                    style={{ paddingLeft: '38px', height: '42px', fontSize: '13px' }}
+                    autoComplete="email"
+                  />
+                </div>
+              </div>
+
+              {/* Password Input */}
+              <div style={{ marginBottom: '14px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text)' }}>
+                    Password
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleAutoFillDemo}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      fontSize: '11px',
+                      color: 'var(--palette-green)',
+                      cursor: 'pointer',
+                      fontWeight: 600
+                    }}
+                  >
+                    Auto-fill Demo
+                  </button>
+                </div>
+                <div style={{ position: 'relative' }}>
+                  <Lock size={16} color="var(--muted-text)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                  <input
+                    type={showLoginPassword ? 'text' : 'password'}
+                    required
+                    value={loginPassword}
+                    onChange={(e) => setLoginPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="form-control"
+                    style={{ paddingLeft: '38px', paddingRight: '38px', height: '42px', fontSize: '13px' }}
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowLoginPassword(!showLoginPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                      color: 'var(--muted-text)'
+                    }}
+                    aria-label={showLoginPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showLoginPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Remember me row */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '18px',
+                fontSize: '12px'
+              }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', color: 'var(--muted-text)' }}>
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    style={{ accentColor: 'var(--palette-green)' }}
+                  />
+                  <span>Remember this device</span>
+                </label>
+                <span style={{ color: 'var(--muted-text)', fontSize: '11px' }}>
+                  Single-business secure
+                </span>
+              </div>
+
+              {/* Primary Sign In Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="btn btn-primary"
+                style={{
+                  width: '100%',
+                  height: '44px',
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  marginBottom: '10px'
+                }}
+              >
+                {isLoading ? (
+                  <span>Authenticating...</span>
+                ) : (
+                  <>
+                    <span>Sign In to Workspace</span>
+                    <ArrowRight size={16} />
+                  </>
+                )}
+              </button>
+
+              {/* Instant 1-Click Demo Login Button (Sleek Lime Accent) */}
+              <button
+                type="button"
+                onClick={handleInstantDemoLogin}
+                disabled={isLoading}
+                style={{
+                  width: '100%',
+                  height: '38px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--bg-subtle)',
+                  border: '1px solid var(--palette-lime)',
+                  color: 'var(--text)',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                  marginBottom: '20px'
+                }}
+              >
+                <Zap size={14} color="var(--palette-green)" />
+                <span>⚡ Instant Demo Access (Vani Studios)</span>
+              </button>
+
+            </form>
+          )}
+
+          {/* ═════════ TAB 2: MINIMALIST REGISTRATION ═════════ */}
+          {activeTab === 'register' && (
+            <form onSubmit={handleRegisterSubmit}>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: 'var(--text)', marginBottom: '4px' }}>
+                    Your Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Ramesh Patel"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="form-control"
+                    style={{ height: '38px', fontSize: '12px' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: 'var(--text)', marginBottom: '4px' }}>
+                    Business Legal Name
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Patel Exports"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    className="form-control"
+                    style={{ height: '38px', fontSize: '12px' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: 'var(--text)', marginBottom: '4px' }}>
+                    Business Email
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="contact@business.in"
+                    value={registerEmail}
+                    onChange={(e) => setRegisterEmail(e.target.value)}
+                    className="form-control"
+                    style={{ height: '38px', fontSize: '12px' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: 'var(--text)', marginBottom: '4px' }}>
+                    Phone (Optional)
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="9876543210"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="form-control"
+                    style={{ height: '38px', fontSize: '12px' }}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '10px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: 'var(--text)', marginBottom: '4px' }}>
+                    State / UT
+                  </label>
+                  <select
+                    value={stateCode}
+                    onChange={(e) => setStateCode(e.target.value)}
+                    className="form-control"
+                    style={{ height: '38px', fontSize: '12px', paddingRight: '20px' }}
+                  >
+                    {GST_STATES.map((s) => (
+                      <option key={s.code} value={s.code}>
+                        {s.code} - {s.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: 'var(--text)', marginBottom: '4px' }}>
+                    GSTIN (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="27ABCDE1234F1Z5"
+                    value={gstin}
+                    onChange={(e) => setGstin(e.target.value.toUpperCase())}
+                    className="form-control"
+                    style={{ height: '38px', fontSize: '12px', fontFamily: 'monospace' }}
+                    maxLength={15}
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 600, color: 'var(--text)', marginBottom: '4px' }}>
+                  Create Password (min 6 characters)
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type={showRegisterPassword ? 'text' : 'password'}
+                    required
+                    value={registerPassword}
+                    onChange={(e) => setRegisterPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="form-control"
+                    style={{ height: '38px', fontSize: '12px', paddingRight: '36px' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowRegisterPassword(!showRegisterPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      padding: 0,
+                      color: 'var(--muted-text)'
+                    }}
+                  >
+                    {showRegisterPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                  </button>
+                </div>
+                {registerPassword && (
+                  <div style={{ marginTop: '6px' }}>
+                    <div style={{ height: '3px', width: '100%', background: 'var(--border)', borderRadius: '2px', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${pwdStrength.percent}%`, background: pwdStrength.color, transition: 'width 0.3s ease' }} />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Register Submit Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="btn btn-primary"
+                style={{
+                  width: '100%',
+                  height: '42px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  marginBottom: '16px'
+                }}
+              >
+                {isLoading ? (
+                  <span>Registering...</span>
+                ) : (
+                  <>
+                    <span>Create GST Workspace</span>
+                    <ArrowRight size={15} />
+                  </>
+                )}
+              </button>
+
+            </form>
+          )}
+
+          {/* ═════════ MINIMALIST SSO & PASSKEY ROW ═════════ */}
+          <div style={{
+            position: 'relative',
+            textAlign: 'center',
+            margin: '14px 0 16px 0'
+          }}>
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              left: 0,
+              right: 0,
+              height: '1px',
+              background: 'var(--border)'
+            }} />
+            <span style={{
+              position: 'relative',
+              background: 'var(--cards)',
+              padding: '0 10px',
+              fontSize: '11px',
+              color: 'var(--muted-text)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              or continue with
+            </span>
+          </div>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr 1fr',
+            gap: '8px'
+          }}>
+            {/* Google */}
+            <button
+              type="button"
+              onClick={() => handleSocialClick('google')}
+              disabled={isLoading}
+              title="Sign in with Google Workspace"
+              style={{
+                height: '38px',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: 'var(--text)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <GoogleIcon size={16} />
+              <span>Google</span>
+            </button>
+
+            {/* Apple */}
+            <button
+              type="button"
+              onClick={() => handleSocialClick('apple')}
+              disabled={isLoading}
+              title="Sign in with Apple ID"
+              style={{
+                height: '38px',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: 'var(--text)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <AppleIcon size={16} />
+              <span>Apple</span>
+            </button>
+
+            {/* Biometric Passkey */}
+            <button
+              type="button"
+              onClick={handlePasskeyClick}
+              disabled={isLoading || passkeyActive}
+              title="Authenticate via Biometric Passkey"
+              style={{
+                height: '38px',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--bg-subtle)',
+                border: '1px solid var(--border)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                fontSize: '12px',
+                fontWeight: 600,
+                color: 'var(--text)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Fingerprint size={16} color="var(--palette-green)" />
+              <span>Touch ID</span>
+            </button>
+          </div>
+
+          {/* Minimal Trust Indicator */}
+          <div style={{
+            marginTop: '20px',
+            paddingTop: '14px',
+            borderTop: '1px solid var(--border-light)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            fontSize: '11px',
+            color: 'var(--muted-text)'
+          }}>
+            <ShieldCheck size={13} color="var(--palette-green)" />
+            <span>256-Bit TLS • CBIC Standard Compliant</span>
           </div>
 
         </div>
 
       </div>
 
-      {/* ============================================================== */}
-      {/* GOOGLE SSO AUTHENTICATION DIALOG */}
-      {/* ============================================================== */}
-      {activeSsoModal === 'google' && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(0, 0, 0, 0.65)',
-          backdropFilter: 'blur(5px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          padding: '20px'
-        }}>
-          <div style={{
-            width: '100%',
-            maxWidth: '430px',
-            background: theme === 'dark' ? '#1E293B' : '#FFFFFF',
-            borderRadius: '16px',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
-            border: '1px solid var(--border)',
-            overflow: 'hidden',
-            color: 'var(--text)',
-            animation: 'fadeIn 0.2s ease-out'
-          }}>
-            {/* Modal Header */}
-            <div style={{
-              padding: '24px 24px 16px',
-              borderBottom: '1px solid var(--border)',
-              display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'space-between'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <GoogleIcon size={24} />
-                <div>
-                  <h3 style={{ fontSize: '17px', fontWeight: 700, margin: 0, color: 'var(--text)' }}>
-                    Sign in with Google
-                  </h3>
-                  <div style={{ fontSize: '12px', color: 'var(--muted-text)', marginTop: '2px' }}>
-                    Choose an account to continue to <strong>BillGST Pro</strong>
-                  </div>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setActiveSsoModal(null)}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: 'var(--muted-text)',
-                  padding: '4px'
-                }}
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Account Selection List */}
-            <div style={{ padding: '16px 24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              
-              {/* Account 1 */}
-              <button
-                type="button"
-                onClick={() => handleExecuteSocialLogin('google', 'rohan.sharma@gmail.com', 'Rohan Sharma', 'Acme Digital Studio')}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '14px',
-                  padding: '12px 14px',
-                  borderRadius: '10px',
-                  background: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                  border: '1px solid var(--border)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'background 0.2s ease'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-hover)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC'}
-              >
-                <div style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '50%',
-                  background: '#4285F4',
-                  color: '#FFFFFF',
-                  fontWeight: 800,
-                  fontSize: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  R
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text)' }}>Rohan Sharma</div>
-                  <div style={{ fontSize: '12px', color: 'var(--muted-text)' }}>rohan.sharma@gmail.com</div>
-                </div>
-                <span style={{ fontSize: '11px', color: 'var(--secondary)', fontWeight: 600 }}>Active</span>
-              </button>
-
-              {/* Account 2 */}
-              <button
-                type="button"
-                onClick={() => handleExecuteSocialLogin('google', 'owner@vanistudios.in', 'Vani Creative Studio', 'Vani Studios LLP')}
-                style={{
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '14px',
-                  padding: '12px 14px',
-                  borderRadius: '10px',
-                  background: theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC',
-                  border: '1px solid var(--border)',
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'background 0.2s ease'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-hover)'}
-                onMouseLeave={(e) => e.currentTarget.style.background = theme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : '#F8FAFC'}
-              >
-                <div style={{
-                  width: '38px',
-                  height: '38px',
-                  borderRadius: '50%',
-                  background: '#34A853',
-                  color: '#FFFFFF',
-                  fontWeight: 800,
-                  fontSize: '16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  V
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text)' }}>Vani Creative Studio</div>
-                  <div style={{ fontSize: '12px', color: 'var(--muted-text)' }}>owner@vanistudios.in</div>
-                </div>
-                <span style={{ fontSize: '11px', color: 'var(--secondary)', fontWeight: 600 }}>GST Owner</span>
-              </button>
-
-              {/* Custom Google Account Option */}
-              {!showCustomGoogle ? (
-                <button
-                  type="button"
-                  onClick={() => setShowCustomGoogle(true)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    padding: '10px 14px',
-                    background: 'transparent',
-                    border: '1px dashed var(--border)',
-                    borderRadius: '10px',
-                    color: 'var(--primary)',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    marginTop: '4px'
-                  }}
-                >
-                  <span>+ Use another Google account</span>
-                </button>
-              ) : (
-                <div style={{
-                  background: 'var(--bg-subtle)',
-                  padding: '12px',
-                  borderRadius: '10px',
-                  border: '1px solid var(--border)',
-                  marginTop: '4px'
-                }}>
-                  <div style={{ fontSize: '12px', fontWeight: 600, marginBottom: '6px' }}>Enter Google Account Email:</div>
-                  <input
-                    type="email"
-                    placeholder="your.email@gmail.com"
-                    value={customGoogleEmail}
-                    onChange={(e) => setCustomGoogleEmail(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '8px 10px',
-                      borderRadius: '6px',
-                      border: '1px solid var(--border)',
-                      fontSize: '13px',
-                      marginBottom: '8px'
-                    }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Your Name (Optional)"
-                    value={customGoogleName}
-                    onChange={(e) => setCustomGoogleName(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '8px 10px',
-                      borderRadius: '6px',
-                      border: '1px solid var(--border)',
-                      fontSize: '13px',
-                      marginBottom: '8px'
-                    }}
-                  />
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-primary"
-                      disabled={!customGoogleEmail}
-                      onClick={() => handleExecuteSocialLogin('google', customGoogleEmail, customGoogleName || 'Google User', `${customGoogleName || 'Custom'}'s Business`)}
-                    >
-                      Authenticate
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-sm btn-outline"
-                      onClick={() => setShowCustomGoogle(false)}
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              )}
-
-            </div>
-
-            {/* Footer disclosure */}
-            <div style={{
-              padding: '12px 24px 18px',
-              borderTop: '1px solid var(--border)',
-              background: 'var(--bg-subtle)',
-              fontSize: '11px',
-              color: 'var(--muted-text)',
-              lineHeight: 1.5
-            }}>
-              To continue, Google will securely share your verified name, email address, and profile picture with BillGST Pro in accordance with Google OAuth 2.0 Security Guidelines.
-            </div>
-          </div>
+      {/* Footer Minimalist Swatch Legend */}
+      <div style={{
+        marginTop: '16px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        fontSize: '11px',
+        color: 'var(--muted-text)',
+        zIndex: 5
+      }}>
+        <span>BillGST Pro</span>
+        <span>•</span>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#499A13' }} title="#499A13" />
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#BBDC12' }} title="#BBDC12" />
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#8ECA3C' }} title="#8ECA3C" />
+          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#276F27' }} title="#276F27" />
         </div>
-      )}
-
-      {/* ============================================================== */}
-      {/* APPLE SSO AUTHENTICATION DIALOG */}
-      {/* ============================================================== */}
-      {activeSsoModal === 'apple' && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(0, 0, 0, 0.75)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          padding: '20px'
-        }}>
-          <div style={{
-            width: '100%',
-            maxWidth: '420px',
-            background: theme === 'dark' ? '#111827' : '#FFFFFF',
-            borderRadius: '20px',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            overflow: 'hidden',
-            color: 'var(--text)',
-            animation: 'fadeIn 0.2s ease-out'
-          }}>
-            {/* Header with Apple Logo */}
-            <div style={{
-              padding: '28px 24px 16px',
-              textAlign: 'center',
-              borderBottom: '1px solid var(--border)'
-            }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '12px',
-                background: '#000000',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: '12px',
-                boxShadow: '0 4px 14px rgba(0, 0, 0, 0.2)'
-              }}>
-                <AppleIcon size={24} color="#FFFFFF" />
-              </div>
-              <h3 style={{ fontSize: '18px', fontWeight: 800, margin: 0, color: 'var(--text)' }}>
-                Sign in with Apple
-              </h3>
-              <p style={{ fontSize: '12px', color: 'var(--muted-text)', marginTop: '4px' }}>
-                Use your Apple ID to sign in securely to <strong>BillGST Pro</strong>
-              </p>
-            </div>
-
-            {/* Apple Email Sharing Options */}
-            <div style={{ padding: '20px 24px' }}>
-              <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--muted-text)', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px' }}>
-                Apple ID: rohan.sharma@icloud.com
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-                <label style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  padding: '12px 14px',
-                  borderRadius: '10px',
-                  border: `1.5px solid ${appleEmailType === 'share' ? 'var(--secondary)' : 'var(--border)'}`,
-                  background: appleEmailType === 'share' ? 'var(--secondary-subtle)' : 'transparent',
-                  cursor: 'pointer'
-                }}>
-                  <input
-                    type="radio"
-                    name="apple_email"
-                    checked={appleEmailType === 'share'}
-                    onChange={() => setAppleEmailType('share')}
-                    style={{ cursor: 'pointer' }}
-                  />
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text)' }}>Share My Email</div>
-                    <div style={{ fontSize: '11px', color: 'var(--muted-text)' }}>rohan.sharma@icloud.com</div>
-                  </div>
-                </label>
-
-                <label style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  padding: '12px 14px',
-                  borderRadius: '10px',
-                  border: `1.5px solid ${appleEmailType === 'hide' ? 'var(--secondary)' : 'var(--border)'}`,
-                  background: appleEmailType === 'hide' ? 'var(--secondary-subtle)' : 'transparent',
-                  cursor: 'pointer'
-                }}>
-                  <input
-                    type="radio"
-                    name="apple_email"
-                    checked={appleEmailType === 'hide'}
-                    onChange={() => setAppleEmailType('hide')}
-                    style={{ cursor: 'pointer' }}
-                  />
-                  <div>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: 'var(--text)' }}>Hide My Email</div>
-                    <div style={{ fontSize: '11px', color: 'var(--muted-text)' }}>rohan_privaterelay@appleid.com</div>
-                  </div>
-                </label>
-              </div>
-
-              {/* Action Buttons */}
-              <button
-                type="button"
-                onClick={() => {
-                  const emailToUse = appleEmailType === 'share' ? 'rohan.sharma@icloud.com' : 'rohan_privaterelay@appleid.com';
-                  handleExecuteSocialLogin('apple', emailToUse, 'Rohan Sharma', 'Rohan Studio Apple');
-                }}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  borderRadius: '10px',
-                  background: '#000000',
-                  color: '#FFFFFF',
-                  fontWeight: 700,
-                  fontSize: '14px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  cursor: 'pointer',
-                  border: 'none',
-                  marginBottom: '10px'
-                }}
-              >
-                <AppleIcon size={16} color="#FFFFFF" />
-                <span>Continue with Face ID / Touch ID</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setActiveSsoModal(null)}
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  borderRadius: '10px',
-                  background: 'transparent',
-                  color: 'var(--muted-text)',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  border: 'none'
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-
-            {/* Apple Security Footnote */}
-            <div style={{
-              padding: '12px 24px',
-              borderTop: '1px solid var(--border)',
-              background: 'var(--bg-subtle)',
-              fontSize: '11px',
-              color: 'var(--muted-text)',
-              textAlign: 'center'
-            }}>
-              Protected by Apple Secure Enclave & Private Relay.
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ============================================================== */}
-      {/* BIOMETRIC PASSKEY VERIFICATION DIALOG */}
-      {/* ============================================================== */}
-      {activeSsoModal === 'passkey' && (
-        <div style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(0, 0, 0, 0.7)',
-          backdropFilter: 'blur(6px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 9999,
-          padding: '20px'
-        }}>
-          <div style={{
-            width: '100%',
-            maxWidth: '380px',
-            background: 'var(--cards)',
-            borderRadius: '20px',
-            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)',
-            border: '1px solid var(--border)',
-            padding: '32px 24px',
-            textAlign: 'center',
-            color: 'var(--text)'
-          }}>
-            {/* Animated Biometric Scanner Icon */}
-            <div style={{
-              width: '72px',
-              height: '72px',
-              borderRadius: '50%',
-              background: passkeyPhase === 'success' ? '#10B981' : 'var(--secondary)',
-              color: '#FFFFFF',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: '18px',
-              boxShadow: `0 0 25px ${passkeyPhase === 'success' ? 'rgba(16, 185, 129, 0.5)' : 'rgba(22, 125, 127, 0.5)'}`,
-              transition: 'all 0.3s ease'
-            }}>
-              {passkeyPhase === 'success' ? (
-                <CheckCircle2 size={36} />
-              ) : (
-                <Fingerprint size={36} style={{ animation: 'pulse 1s infinite' }} />
-              )}
-            </div>
-
-            <h3 style={{ fontSize: '18px', fontWeight: 800, margin: '0 0 6px 0', color: 'var(--text)' }}>
-              {passkeyPhase === 'success' ? 'Biometrics Verified!' : 'Scanning Passkey...'}
-            </h3>
-            
-            <p style={{ fontSize: '13px', color: 'var(--muted-text)', margin: '0 0 20px 0' }}>
-              {passkeyPhase === 'success'
-                ? 'Identity confirmed with Device Secure Enclave. Accessing workspace...'
-                : 'Touch your fingerprint scanner or glance at Face ID sensor to authenticate.'}
-            </p>
-
-            <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '11px',
-              color: 'var(--secondary)',
-              background: 'var(--secondary-subtle)',
-              padding: '6px 12px',
-              borderRadius: '20px',
-              fontWeight: 700
-            }}>
-              <ShieldCheck size={14} />
-              <span>FIDO2 / WebAuthn Protocol Active</span>
-            </div>
-          </div>
-        </div>
-      )}
+        <span>•</span>
+        <span>Minimalist & Clean</span>
+      </div>
 
     </div>
   );

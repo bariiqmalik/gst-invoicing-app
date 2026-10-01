@@ -112,7 +112,7 @@ export default function CatalogView({
 
         <button 
           id="add-catalog-item-btn"
-          className="btn btn-accent"
+          className="btn btn-primary"
           onClick={openAddModal}
         >
           <Plus size={16} />

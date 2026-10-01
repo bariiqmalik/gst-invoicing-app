@@ -149,7 +149,7 @@ export default function CustomersView({
 
         <button 
           id="add-customer-btn"
-          className="btn btn-accent"
+          className="btn btn-primary"
           onClick={openAddModal}
         >
           <Plus size={16} />
@@ -237,7 +237,7 @@ export default function CustomersView({
                   style={{ fontSize: '12px' }}
                   onClick={() => onQuickCreateInvoiceForCustomer(c)}
                 >
-                  <FilePlus size={14} color="var(--accent-dark)" />
+                  <FilePlus size={14} color="var(--primary)" />
                   <span>Invoice Client</span>
                 </button>
 
