@@ -98,7 +98,7 @@ export default function App() {
       if (!catRes.error) setCatalogItems(catRes.data || []);
       if (!invRes.error) setInvoices(invRes.data || []);
     } catch (err) {
-      showToast(err.message || 'Unable to load workspace data from Supabase.', 'error');
+      showToast(err.message || 'Unable to load workspace data.', 'error');
     }
   }, [searchQuery, statusFilter, startDate, endDate, showToast]);
 
@@ -242,7 +242,7 @@ export default function App() {
       setIsCreateInvoiceOpen(false);
       await loadSupabaseData();
       if (data) setActivePreviewInvoice(data);
-      showToast(`Invoice #${data?.invoiceNumber || ''} created and saved to Supabase!`, 'success');
+      showToast(`Invoice #${data?.invoiceNumber || ''} created successfully!`, 'success');
     } catch (err) {
       showToast(err.message || 'Failed to create invoice.', 'error');
     }
@@ -349,7 +349,7 @@ export default function App() {
       const { data, error } = await businessService.updateProfile(bizData);
       if (error) throw new Error(error.message);
       if (data) setBusiness(data);
-      showToast('Business GST profile saved to Supabase successfully.', 'success');
+      showToast('Business GST profile saved successfully.', 'success');
     } catch (err) {
       showToast(err.message || 'Failed to save business settings.', 'error');
     }

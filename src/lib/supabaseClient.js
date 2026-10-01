@@ -8,7 +8,8 @@ const supabaseAnonKey =
 /**
  * Singleton Supabase browser client.
  * Exported as null when env vars are missing so the app still boots.
- * Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel → Settings → Environment Variables.
+ * When null, dbService automatically uses the built-in Express REST API.
+ * To use Supabase: Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Vercel → Project Settings → Environment Variables.
  */
 let supabase = null;
 
@@ -25,10 +26,11 @@ if (supabaseUrl && supabaseAnonKey) {
     console.error('[Supabase] Failed to initialise client:', err.message);
   }
 } else {
-  console.warn(
-    '[Supabase] Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY. ' +
-    'Add them in Vercel → Project → Settings → Environment Variables.'
+  console.info(
+    '[Supabase] VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY not set. ' +
+    'Operating in standalone Express REST mode.'
   );
 }
 
+export const isSupabaseConfigured = Boolean(supabase);
 export { supabase };
