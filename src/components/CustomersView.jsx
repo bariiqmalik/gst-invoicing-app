@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Search, Edit2, Trash2, FilePlus } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, FilePlus, Users } from 'lucide-react';
 import { 
   GST_STATES, 
   validateCustomerGSTIN, 
@@ -172,100 +172,131 @@ export default function CustomersView({
         </div>
       </div>
 
-      {/* Customer Cards Grid (Generous internal padding & subtle drop-shadows) */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
-        gap: '24px'
-      }}>
-        {filtered.map(c => {
-          const isB2B = !!(c.gstin && c.gstin.trim());
-          return (
-            <div key={c.id} className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-              <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
-                  <div>
-                    <h3 style={{ color: 'var(--primary)' }}>{c.name}</h3>
-                    {c.companyName && (
-                      <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)', marginTop: '2px' }}>
-                        {c.companyName}
+      {/* Customer Cards Grid or Empty State */}
+      {filtered.length === 0 ? (
+        <div className="card" style={{ textAlign: 'center', padding: '64px 20px', color: 'var(--muted-text)' }}>
+          <Users size={48} color="var(--border)" style={{ marginBottom: '16px' }} />
+          <h3 style={{ color: 'var(--text)' }}>
+            {search ? `No customers matching "${search}"` : 'No customers recorded yet'}
+          </h3>
+          <p style={{ fontSize: '14px', marginTop: '6px', color: 'var(--muted-text)', maxWidth: '440px', margin: '6px auto 0' }}>
+            {search 
+              ? 'Try adjusting your search criteria or clear the search input.' 
+              : 'Add your first customer to easily generate and dispatch GST tax invoices.'}
+          </p>
+          {search ? (
+            <button 
+              className="btn btn-outline btn-sm"
+              onClick={() => setSearch('')}
+              style={{ marginTop: '20px' }}
+            >
+              Clear Search
+            </button>
+          ) : (
+            <button 
+              className="btn btn-primary btn-sm"
+              onClick={openAddModal}
+              style={{ marginTop: '20px' }}
+            >
+              <Plus size={15} /> Add First Customer
+            </button>
+          )}
+        </div>
+      ) : (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))',
+          gap: '24px'
+        }}>
+          {filtered.map(c => {
+            const isB2B = !!(c.gstin && c.gstin.trim());
+            return (
+              <div key={c.id} className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                    <div>
+                      <h3 style={{ color: 'var(--primary)' }}>{c.name}</h3>
+                      {c.companyName && (
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)', marginTop: '2px' }}>
+                          {c.companyName}
+                        </div>
+                      )}
+                    </div>
+                    <span className={`badge ${isB2B ? 'badge-paid' : 'badge-draft'}`}>
+                      {isB2B ? 'B2B Registered' : 'B2C Consumer'}
+                    </span>
+                  </div>
+
+                  <div style={{ marginTop: '16px', fontSize: '13px', color: 'var(--text)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div>
+                      <span style={{ color: 'var(--muted-text)' }}>GSTIN: </span>
+                      {c.gstin ? (
+                        <strong style={{ fontFamily: 'monospace', color: 'var(--primary)' }}>{c.gstin}</strong>
+                      ) : (
+                        <span style={{ fontStyle: 'italic', color: 'var(--text-light)' }}>None (Unregistered)</span>
+                      )}
+                    </div>
+                    <div>
+                      <span style={{ color: 'var(--muted-text)' }}>Location: </span>
+                      <span>{c.billingAddress?.city ? `${c.billingAddress.city}, ` : ''}{c.billingAddress?.state} ({c.billingAddress?.stateCode || '--'})</span>
+                    </div>
+                    <div>
+                      <span style={{ color: 'var(--muted-text)' }}>Email: </span>
+                      <span>{c.email}</span>
+                    </div>
+                    {c.phone && (
+                      <div>
+                        <span style={{ color: 'var(--muted-text)' }}>Phone: </span>
+                        <span>{c.phone}</span>
                       </div>
                     )}
                   </div>
-                  <span className={`badge ${isB2B ? 'badge-paid' : 'badge-draft'}`}>
-                    {isB2B ? 'B2B Registered' : 'B2C Consumer'}
-                  </span>
                 </div>
 
-                <div style={{ marginTop: '16px', fontSize: '13px', color: 'var(--text)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                  <div>
-                    <span style={{ color: 'var(--muted-text)' }}>GSTIN: </span>
-                    {c.gstin ? (
-                      <strong style={{ fontFamily: 'monospace', color: 'var(--primary)' }}>{c.gstin}</strong>
-                    ) : (
-                      <span style={{ fontStyle: 'italic', color: 'var(--text-light)' }}>None (Unregistered)</span>
-                    )}
+                {/* Card Footer Actions */}
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '20px',
+                  paddingTop: '14px',
+                  borderTop: '1px solid var(--border)'
+                }}>
+                  <button
+                    className="btn btn-outline btn-sm"
+                    style={{ fontSize: '12px' }}
+                    onClick={() => onQuickCreateInvoiceForCustomer(c)}
+                  >
+                    <FilePlus size={14} color="var(--primary)" />
+                    <span>Invoice Client</span>
+                  </button>
+
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      style={{ padding: '6px' }}
+                      onClick={() => openEditModal(c)}
+                      title="Edit customer"
+                      aria-label="Edit customer"
+                    >
+                      <Edit2 size={15} />
+                    </button>
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      style={{ padding: '6px', color: 'var(--danger)' }}
+                      onClick={() => onDeleteCustomer(c.id)}
+                      title="Delete customer"
+                      aria-label="Delete customer"
+                    >
+                      <Trash2 size={15} />
+                    </button>
                   </div>
-                  <div>
-                    <span style={{ color: 'var(--muted-text)' }}>Location: </span>
-                    <span>{c.billingAddress?.city ? `${c.billingAddress.city}, ` : ''}{c.billingAddress?.state} ({c.billingAddress?.stateCode || '--'})</span>
-                  </div>
-                  <div>
-                    <span style={{ color: 'var(--muted-text)' }}>Email: </span>
-                    <span>{c.email}</span>
-                  </div>
-                  {c.phone && (
-                    <div>
-                      <span style={{ color: 'var(--muted-text)' }}>Phone: </span>
-                      <span>{c.phone}</span>
-                    </div>
-                  )}
                 </div>
               </div>
-
-              {/* Card Footer Actions */}
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: '20px',
-                paddingTop: '14px',
-                borderTop: '1px solid var(--border)'
-              }}>
-                <button
-                  className="btn btn-outline btn-sm"
-                  style={{ fontSize: '12px' }}
-                  onClick={() => onQuickCreateInvoiceForCustomer(c)}
-                >
-                  <FilePlus size={14} color="var(--primary)" />
-                  <span>Invoice Client</span>
-                </button>
-
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    style={{ padding: '6px' }}
-                    onClick={() => openEditModal(c)}
-                    title="Edit customer"
-                    aria-label="Edit customer"
-                  >
-                    <Edit2 size={15} />
-                  </button>
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    style={{ padding: '6px', color: 'var(--danger)' }}
-                    onClick={() => onDeleteCustomer(c.id)}
-                    title="Delete customer"
-                    aria-label="Delete customer"
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Add / Edit Customer Modal */}
       {isModalOpen && (

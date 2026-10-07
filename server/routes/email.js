@@ -24,12 +24,12 @@ router.get('/queue-status', authenticateToken, async (req, res) => {
 // POST /api/invoices/:id/send-email (Centralized SaaS Dispatch with Dynamic Reply-To)
 router.post('/:id/send-email', authenticateToken, async (req, res) => {
   try {
-    const invoice = await db.invoices.findById(req.params.id);
+    const invoice = await (req.db ? req.db.invoices.findById(req.params.id) : db.invoices.findById(req.params.id, req.workspace_id));
     if (!invoice) {
       return res.status(404).json({ success: false, message: 'Invoice not found' });
     }
 
-    const business = await db.business.getProfile();
+    const business = await (req.db ? req.db.business.getProfile() : db.business.getProfile(req.workspace_id));
     const recipientEmail = req.body.email || invoice.customerDetails?.email;
 
     if (!recipientEmail) {
@@ -43,7 +43,7 @@ router.post('/:id/send-email', authenticateToken, async (req, res) => {
     const result = await dispatchCentralizedInvoiceEmail(invoice, business, recipientEmail);
 
     // Update invoice record with email delivery status
-    const updatedInvoice = await db.invoices.update(invoice.id, {
+    const updatePayload = {
       status: invoice.status === 'Draft' ? 'Sent' : invoice.status,
       emailDelivery: {
         sent: true,
@@ -53,7 +53,8 @@ router.post('/:id/send-email', authenticateToken, async (req, res) => {
         replyTo: result.replyTo,
         dispatchedFrom: result.from
       }
-    });
+    };
+    const updatedInvoice = await (req.db ? req.db.invoices.update(invoice.id, updatePayload) : db.invoices.update(invoice.id, updatePayload, req.workspace_id));
 
     const isLive = result.isLiveResend;
     const feedbackMessage = isLive 

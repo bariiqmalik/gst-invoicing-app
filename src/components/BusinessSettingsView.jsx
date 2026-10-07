@@ -13,33 +13,34 @@ import {
 import { GST_STATES, validateGSTIN } from '../utils/gstFrontendUtils';
 
 function getBusinessFormData(b) {
+  const currentYear = new Date().getFullYear();
   return {
-    legalName: b?.legalName || 'Vani Studios Private Limited',
-    tradeName: b?.tradeName || 'Vani Studios Private Limited',
-    gstin: b?.gstin || '27AABCV1234F1Z8',
-    pan: b?.pan || 'AABCV1234F',
-    email: b?.email || 'billing@vanistudios.in',
-    phone: b?.phone || '+91 98200 00000',
-    addressLine1: b?.addressLine1 || 'Suite 402, Lotus Grandeur, Andheri West',
-    addressLine2: b?.addressLine2 || 'Veera Desai Road',
-    city: b?.city || 'Mumbai',
+    legalName: b?.legalName || b?.name || '',
+    tradeName: b?.tradeName || b?.legalName || b?.name || '',
+    gstin: b?.gstin || '',
+    pan: b?.pan || '',
+    email: b?.email || '',
+    phone: b?.phone || '',
+    addressLine1: b?.addressLine1 || (typeof b?.address === 'string' ? b?.address : '') || '',
+    addressLine2: b?.addressLine2 || '',
+    city: b?.city || '',
     state: b?.state || 'Maharashtra',
     stateCode: b?.stateCode || '27',
-    pincode: b?.pincode || '400053',
+    pincode: b?.pincode || '',
     bankDetails: {
-      bankName: b?.bankDetails?.bankName || 'HDFC Bank Ltd',
-      accountHolder: b?.bankDetails?.accountHolder || b?.legalName || 'Vani Studios Private Limited',
-      accountNumber: b?.bankDetails?.accountNumber || '50200049281729',
-      ifscCode: b?.bankDetails?.ifscCode || 'HDFC0001042',
-      branch: b?.bankDetails?.branch || 'Andheri West Branch, Mumbai',
-      upiId: b?.bankDetails?.upiId || 'vanistudios@okhdfcbank'
+      bankName: b?.bankDetails?.bankName || '',
+      accountHolder: b?.bankDetails?.accountHolder || b?.legalName || b?.name || '',
+      accountNumber: b?.bankDetails?.accountNumber || '',
+      ifscCode: b?.bankDetails?.ifscCode || '',
+      branch: b?.bankDetails?.branch || '',
+      upiId: b?.bankDetails?.upiId || ''
     },
-    invoicePrefix: b?.invoicePrefix || 'INV-2024-',
-    nextInvoiceNumber: b?.nextInvoiceNumber || 104,
+    invoicePrefix: b?.invoicePrefix || `INV-${currentYear}-`,
+    nextInvoiceNumber: b?.nextInvoiceNumber || 101,
     termsAndConditions: b?.termsAndConditions || '1. Payment is due within 15 days of invoice date.\n2. Please mention the invoice number in the NEFT/RTGS/IMPS transfer remarks.\n3. Goods or services once billed are non-refundable unless agreed in writing.',
     defaultNotes: b?.defaultNotes || 'Thank you for your business! We appreciate the opportunity to collaborate with you.',
     resendApiKey: b?.resendApiKey || '',
-    resendFromEmail: b?.resendFromEmail || 'invoicing@updates.resend.dev'
+    resendFromEmail: b?.resendFromEmail || ''
   };
 }
 

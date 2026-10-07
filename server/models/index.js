@@ -373,25 +373,7 @@ export const db = {
       }
 
       if (!ws) {
-        // Fallback create default workspace profile
-        ws = await db.workspaces.create({
-          name: 'Vani Studios Private Limited',
-          legalName: 'Vani Studios Private Limited',
-          tradeName: 'Vani Studios Private Limited',
-          gstin: '27AAACN1234E1Z9',
-          pan: 'AAACN1234E',
-          email: 'billing@vanistudios.in',
-          phone: '+91 98200 00000',
-          address: 'Suite 402, Lotus Grandeur, Andheri West, Veera Desai Road, Mumbai, Maharashtra 400053',
-          addressLine1: 'Suite 402, Lotus Grandeur, Andheri West',
-          addressLine2: 'Veera Desai Road',
-          city: 'Mumbai',
-          state: 'Maharashtra',
-          stateCode: '27',
-          pincode: '400053',
-          invoicePrefix: 'INV-2024-',
-          nextInvoiceNumber: 104
-        });
+        return null;
       }
       return sanitizeDocument(ws);
     },
@@ -401,6 +383,7 @@ export const db = {
         const current = await this.getProfile();
         targetId = current?.id;
       }
+      if (!targetId) return null;
       if (updates.legalName && !updates.name) {
         updates.name = updates.legalName;
       }

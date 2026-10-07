@@ -7,11 +7,8 @@ A comprehensive, production-ready GST invoicing and billing web application tail
 ## 🚀 Key Highlights & GST Capabilities
 
 ### 1. Core Workspace & Single-Owner Access
-- **Protected Workspace:** Single-business owner login gate with secure JWT authentication.
-- **Default Owner Credentials:**
-  - **Email:** `owner@vanistudios.in`
-  - **Password:** `Admin@12345`
-  - *(Convenient 1-click **Auto-fill** button available on the sign-in screen)*
+- **Protected Workspace:** Single-business owner login gate with secure JWT authentication and self-serve workspace registration.
+- **Clean Workspace Registration:** Register your business name, legal entity name, GSTIN, PAN, and credentials to initialize a clean workspace with zero dummy data.
 - **Persistent Storage & Clean Serialization:** Database serialization layer cleanly strips raw MongoDB IDs (`_id` and `__v`) from all API responses, returning clean `id` attributes. Supports MongoDB via Mongoose or persistent fallback disk storage in `server/data/`.
 
 ### 2. Comprehensive Indian GST Rules & Tax Engine
@@ -76,7 +73,7 @@ gst-invoicing-app/
 │   │   ├── BusinessSettingsView.jsx # Legal entity, GSTIN, bank & Resend config
 │   │   ├── EmailModal.jsx           # Resend email delivery modal
 │   │   ├── PaymentModal.jsx         # Record payments & confetti triggers
-│   │   └── LoginModal.jsx           # Single-owner access gate & demo autofill
+│   │   └── LoginModal.jsx           # Single-owner access gate & workspace registration
 │   ├── services/
 │   │   └── api.js                   # Authenticated API client
 │   ├── utils/

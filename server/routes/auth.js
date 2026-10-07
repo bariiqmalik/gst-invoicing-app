@@ -9,52 +9,20 @@ export { authenticateToken, JWT_SECRET };
 
 const router = express.Router();
 
-/**
- * Seed initial workspace and owner if no workspace or user exists
- */
 export async function seedInitialOwner() {
-  let defaultWs = (await db.workspaces.find())[0];
-
-  if (!defaultWs) {
-    defaultWs = await db.workspaces.create({
-      name: 'Vani Studios Private Limited',
-      legalName: 'Vani Studios Private Limited',
-      tradeName: 'Vani Studios Private Limited',
-      gstin: '27AAACN1234E1Z9',
-      pan: 'AAACN1234E',
-      email: 'billing@vanistudios.in',
-      phone: '+91 98200 00000',
-      address: 'Suite 402, Lotus Grandeur, Andheri West, Veera Desai Road, Mumbai, Maharashtra 400053',
-      addressLine1: 'Suite 402, Lotus Grandeur, Andheri West',
-      addressLine2: 'Veera Desai Road',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      stateCode: '27',
-      pincode: '400053',
-      invoicePrefix: 'INV-2024-',
-      nextInvoiceNumber: 104,
-      termsAndConditions: '1. Payment is due within 15 days of invoice date.\n2. Please mention the invoice number in the NEFT/RTGS/IMPS transfer remarks.\n3. Goods or services once billed are non-refundable unless agreed in writing.',
-      defaultNotes: 'Thank you for your business! We appreciate the opportunity to collaborate with you.'
-    });
-    console.log(`Default Workspace created: ${defaultWs.name} (${defaultWs.id})`);
-  }
-
-  const userCount = await db.users.count();
-  if (userCount === 0) {
-    const hashedPassword = await bcrypt.hash('Admin@12345', 10);
-    const owner = await db.users.create({
-      email: 'owner@vanistudios.in',
-      password_hash: hashedPassword,
-      name: 'Rohan Sharma',
-      role: 'owner',
-      workspace_id: defaultWs.id,
-      businessName: defaultWs.name
-    });
-
-    await db.workspaces.update(defaultWs.id, { owner_id: owner.id });
-    console.log('Default Business Owner created: owner@vanistudios.in / Admin@12345');
-  }
+  // Clean initialization: No demo accounts are seeded.
+  return;
 }
+
+// GET /api/auth/status (Check if any accounts exist to guide Login vs Register UI)
+router.get('/status', async (req, res) => {
+  try {
+    const userCount = await db.users.count();
+    res.json({ success: true, hasUsers: userCount > 0 });
+  } catch (err) {
+    res.status(500).json({ success: false, hasUsers: false, message: err.message });
+  }
+});
 
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
@@ -162,6 +130,7 @@ router.post('/register', async (req, res) => {
     }
 
     // 1. Create Workspace
+    const currentYear = new Date().getFullYear();
     const newWorkspace = await db.workspaces.create({
       name: businessName.trim(),
       legalName: businessName.trim(),
@@ -173,8 +142,18 @@ router.post('/register', async (req, res) => {
       address: state ? `${state}` : '',
       state: state || 'Maharashtra',
       stateCode: stateCode || '27',
-      invoicePrefix: 'INV-2024-',
+      invoicePrefix: `INV-${currentYear}-`,
       nextInvoiceNumber: 101,
+      bankDetails: {
+        bankName: '',
+        accountHolder: businessName.trim(),
+        accountNumber: '',
+        ifscCode: '',
+        branch: '',
+        upiId: ''
+      },
+      termsAndConditions: '1. Payment is due within 15 days of invoice date.\n2. Please mention the invoice number in the payment remarks.\n3. Goods or services once billed are non-refundable unless agreed in writing.',
+      defaultNotes: 'Thank you for your business! We appreciate the opportunity to collaborate with you.',
       created_at: new Date().toISOString()
     });
 
@@ -232,7 +211,7 @@ router.post('/social', async (req, res) => {
     }
 
     if (!email) {
-      return res.status(400).json({ success: false, message: 'Email is required from OAuth provider.' });
+      return res.status(400).json({ success: false, message: 'Email is required for Single Sign-On.' });
     }
 
     const cleanEmail = email.toLowerCase().trim();
@@ -245,11 +224,24 @@ router.post('/social', async (req, res) => {
       const defaultBiz = businessName || `${displayName}'s Workspace`;
 
       // Create Workspace first
+      const currentYear = new Date().getFullYear();
       workspace = await db.workspaces.create({
         name: defaultBiz,
         legalName: defaultBiz,
         tradeName: defaultBiz,
         email: cleanEmail,
+        invoicePrefix: `INV-${currentYear}-`,
+        nextInvoiceNumber: 101,
+        bankDetails: {
+          bankName: '',
+          accountHolder: defaultBiz,
+          accountNumber: '',
+          ifscCode: '',
+          branch: '',
+          upiId: ''
+        },
+        termsAndConditions: '1. Payment is due within 15 days of invoice date.\n2. Please mention the invoice number in the payment remarks.\n3. Goods or services once billed are non-refundable unless agreed in writing.',
+        defaultNotes: 'Thank you for your business! We appreciate the opportunity to collaborate with you.',
         created_at: new Date().toISOString()
       });
 
@@ -312,17 +304,16 @@ router.post('/social', async (req, res) => {
 router.post('/passkey', async (req, res) => {
   try {
     const { email } = req.body;
-    let user = null;
 
-    if (email) {
-      user = await db.users.findOne({ email: email.toLowerCase().trim() });
-    }
-    if (!user) {
-      user = await db.users.findOne({ role: 'owner' });
+    if (!email || !email.trim()) {
+      return res.status(400).json({ success: false, message: 'Please enter your account email to authenticate via Biometric Passkey.' });
     }
 
+    const cleanEmail = email.toLowerCase().trim();
+    const user = await db.users.findOne({ email: cleanEmail });
+
     if (!user) {
-      return res.status(404).json({ success: false, message: 'No registered workspace found for Passkey authentication.' });
+      return res.status(404).json({ success: false, message: `No registered workspace account found for email: ${cleanEmail}.` });
     }
 
     let workspace = await db.workspaces.findById(user.workspace_id);

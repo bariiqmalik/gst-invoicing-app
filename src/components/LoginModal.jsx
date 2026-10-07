@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Lock, 
   Mail, 
@@ -10,10 +10,10 @@ import {
   Sun, 
   Moon, 
   Fingerprint, 
-  ShieldCheck,
-  Zap
+  ShieldCheck
 } from 'lucide-react';
 import { GST_STATES, validateGSTIN } from '../utils/gstFrontendUtils';
+import { api } from '../services/api';
 
 // Minimalist Brand Icons for Social Logins
 const GoogleIcon = ({ size = 18 }) => (
@@ -56,9 +56,9 @@ export default function LoginModal({
 }) {
   const [activeTab, setActiveTab] = useState('login'); // 'login' | 'register'
 
-  // Login form state
-  const [loginEmail, setLoginEmail] = useState('owner@vanistudios.in');
-  const [loginPassword, setLoginPassword] = useState('Admin@12345');
+  // Login form state - clean, zero demo accounts
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
@@ -77,31 +77,20 @@ export default function LoginModal({
   const [isLoading, setIsLoading] = useState(false);
   const [passkeyActive, setPasskeyActive] = useState(false);
 
+  // Auto-detect if no accounts exist yet to default to registration
+  useEffect(() => {
+    let isMounted = true;
+    api.getAuthStatus()
+      .then(res => {
+        if (isMounted && res && res.hasUsers === false) {
+          setActiveTab('register');
+        }
+      })
+      .catch(() => {});
+    return () => { isMounted = false; };
+  }, []);
+
   const pwdStrength = calculatePasswordStrength(registerPassword);
-
-  // Fill demo credentials
-  const handleAutoFillDemo = () => {
-    setActiveTab('login');
-    setLoginEmail('owner@vanistudios.in');
-    setLoginPassword('Admin@12345');
-    setError('');
-  };
-
-  // Instant 1-click Demo Login
-  const handleInstantDemoLogin = async () => {
-    setActiveTab('login');
-    setLoginEmail('owner@vanistudios.in');
-    setLoginPassword('Admin@12345');
-    setError('');
-    setIsLoading(true);
-    try {
-      await onLogin({ email: 'owner@vanistudios.in', password: 'Admin@12345' });
-    } catch (err) {
-      setError(err.message || 'Demo login failed. Please ensure the server is running.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   // Submit Login
   const handleLoginSubmit = async (e) => {
@@ -123,7 +112,7 @@ export default function LoginModal({
     try {
       await onLogin({ email, password: pwd });
     } catch (err) {
-      setError(err.message || 'Invalid credentials. Click "Instant Demo" to log in immediately.');
+      setError(err.message || 'Invalid email or password. Please verify your credentials or create a workspace.');
     } finally {
       setIsLoading(false);
     }
@@ -188,12 +177,17 @@ export default function LoginModal({
   // Quick Social SSO
   const handleSocialClick = async (provider) => {
     setError('');
+    const emailToUse = (activeTab === 'register' ? registerEmail : loginEmail).trim();
+    if (!emailToUse) {
+      setError(`Please enter your email above to continue with ${provider === 'google' ? 'Google' : 'Apple'} Sign-In.`);
+      return;
+    }
     setIsLoading(true);
     try {
-      const name = provider === 'google' ? 'Google Workspace User' : 'Apple Enterprise User';
-      const email = provider === 'google' ? 'google.user@vanistudios.in' : 'apple.user@vanistudios.in';
+      const nameToUse = fullName.trim() || emailToUse.split('@')[0];
+      const bizToUse = businessName.trim() || `${nameToUse}'s Workspace`;
       if (onSocialLogin) {
-        await onSocialLogin({ provider, email, name, businessName: 'Vani Studios Private Limited' });
+        await onSocialLogin({ provider, email: emailToUse, name: nameToUse, businessName: bizToUse });
       }
     } catch (err) {
       setError(err.message || `${provider} authentication failed.`);
@@ -205,10 +199,15 @@ export default function LoginModal({
   // Quick Passkey Biometric
   const handlePasskeyClick = async () => {
     setError('');
+    const emailToUse = (loginEmail || registerEmail).trim();
+    if (!emailToUse) {
+      setError('Please enter your account email above to authenticate with Passkey / Touch ID.');
+      return;
+    }
     setPasskeyActive(true);
     try {
       if (onPasskeyLogin) {
-        await onPasskeyLogin({ email: loginEmail || 'owner@vanistudios.in' });
+        await onPasskeyLogin({ email: emailToUse });
       }
     } catch (err) {
       setError(err.message || 'Passkey verification failed.');
@@ -492,26 +491,15 @@ export default function LoginModal({
 
               {/* Password Input */}
               <div style={{ marginBottom: '14px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <label style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text)' }}>
-                    Password
-                  </label>
-                  <button
-                    type="button"
-                    onClick={handleAutoFillDemo}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      padding: 0,
-                      fontSize: '11px',
-                      color: 'var(--palette-green)',
-                      cursor: 'pointer',
-                      fontWeight: 600
-                    }}
-                  >
-                    Auto-fill Demo
-                  </button>
-                </div>
+                <label style={{
+                  display: 'block',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: 'var(--text)',
+                  marginBottom: '6px'
+                }}>
+                  Password
+                </label>
                 <div style={{ position: 'relative' }}>
                   <Lock size={16} color="var(--muted-text)" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
                   <input
@@ -581,7 +569,7 @@ export default function LoginModal({
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  marginBottom: '10px'
+                  marginBottom: '16px'
                 }}
               >
                 {isLoading ? (
@@ -592,33 +580,6 @@ export default function LoginModal({
                     <ArrowRight size={16} />
                   </>
                 )}
-              </button>
-
-              {/* Instant 1-Click Demo Login Button (Sleek Lime Accent) */}
-              <button
-                type="button"
-                onClick={handleInstantDemoLogin}
-                disabled={isLoading}
-                style={{
-                  width: '100%',
-                  height: '38px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'var(--bg-subtle)',
-                  border: '1px solid var(--palette-lime)',
-                  color: 'var(--text)',
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s ease',
-                  marginBottom: '20px'
-                }}
-              >
-                <Zap size={14} color="var(--palette-green)" />
-                <span>⚡ Instant Demo Access (Vani Studios)</span>
               </button>
 
             </form>

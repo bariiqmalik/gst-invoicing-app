@@ -267,10 +267,10 @@ export async function dispatchCentralizedInvoiceEmail(invoice, business, recipie
     const senderDisplay = `"${business.legalName || 'Business'} via BillGST Pro" <${fromSender}>`;
 
     // 2. Dynamic Reply-To directly to the Business Owner
-    const replyToEmail = business.email || 'billing@vanistudios.in';
+    const replyToEmail = business.email || 'billing@invoicing.local';
 
     // 3. Subject and HTML
-    const emailSubject = `Tax Invoice #${invoice.invoiceNumber} from ${business.legalName}`;
+    const emailSubject = `Tax Invoice #${invoice.invoiceNumber} from ${business.legalName || 'Business'}`;
     const emailHtml = generateInvoiceEmailHtml(invoice, business);
 
     const masterKey = process.env.RESEND_API_KEY || MASTER_RESEND_KEY;

@@ -115,7 +115,7 @@ export function calculateGstInvoice(items, businessStateCode, posStateCode, reve
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const { search, status, startDate, endDate } = req.query;
-    let invoices = await db.invoices.find();
+    let invoices = await (req.db ? req.db.invoices.find() : db.invoices.find({ workspace_id: req.workspace_id }));
 
     // In-memory filter
     if (search) {
@@ -149,11 +149,11 @@ router.get('/', authenticateToken, async (req, res) => {
 // GET /api/invoices/:id
 router.get('/:id', authenticateToken, async (req, res) => {
   try {
-    const invoice = await db.invoices.findById(req.params.id);
+    const invoice = await (req.db ? req.db.invoices.findById(req.params.id) : db.invoices.findById(req.params.id, req.workspace_id));
     if (!invoice) {
       return res.status(404).json({ success: false, message: 'Invoice not found' });
     }
-    const business = await db.business.getProfile();
+    const business = await (req.db ? req.db.business.getProfile() : db.business.getProfile(req.workspace_id));
     res.json({ success: true, invoice, business });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -222,8 +222,8 @@ router.post('/', authenticateToken, async (req, res) => {
     }
 
     // Get Business State Code
-    const business = await db.business.getProfile();
-    const businessStateCode = business.stateCode || '27';
+    const business = await (req.db ? req.db.business.getProfile() : db.business.getProfile(req.workspace_id));
+    const businessStateCode = business?.stateCode || '27';
 
     // Calculate all GST taxes, rates and splits
     const calc = calculateGstInvoice(items, businessStateCode, placeOfSupplyStateCode, !!reverseCharge);
@@ -231,11 +231,15 @@ router.post('/', authenticateToken, async (req, res) => {
     // Determine invoice number
     let finalInvNum = invoiceNumber;
     if (!finalInvNum) {
-      finalInvNum = `${business.invoicePrefix || 'INV-'}${business.nextInvoiceNumber || 101}`;
-      await db.business.updateProfile({ nextInvoiceNumber: (business.nextInvoiceNumber || 101) + 1 });
+      finalInvNum = `${business?.invoicePrefix || 'INV-'}${business?.nextInvoiceNumber || 101}`;
+      if (req.db) {
+        await req.db.business.updateProfile({ nextInvoiceNumber: (business?.nextInvoiceNumber || 101) + 1 });
+      } else {
+        await db.business.updateProfile({ nextInvoiceNumber: (business?.nextInvoiceNumber || 101) + 1 }, req.workspace_id);
+      }
     }
 
-    const newInvoice = await db.invoices.create({
+    const invoicePayload = {
       invoiceNumber: finalInvNum,
       invoiceDate: invoiceDate || new Date().toISOString().split('T')[0],
       dueDate: dueDate || new Date(Date.now() + 15 * 86400000).toISOString().split('T')[0],
@@ -253,9 +257,10 @@ router.post('/', authenticateToken, async (req, res) => {
       totalTaxAmount: calc.totalTaxAmount,
       grandTotal: calc.grandTotal,
       totalInWords: calc.totalInWords,
-      notes: notes !== undefined ? notes : business.defaultNotes,
-      termsAndConditions: termsAndConditions !== undefined ? termsAndConditions : business.termsAndConditions,
+      notes: notes !== undefined ? notes : (business?.defaultNotes || ''),
+      termsAndConditions: termsAndConditions !== undefined ? termsAndConditions : (business?.termsAndConditions || ''),
       status: status || 'Draft',
+      workspace_id: req.workspace_id,
       paymentDetails: {
         amountPaid: 0,
         paymentDate: '',
@@ -269,7 +274,9 @@ router.post('/', authenticateToken, async (req, res) => {
         recipient: customerDetails.email || '',
         messageId: ''
       }
-    });
+    };
+
+    const newInvoice = await (req.db ? req.db.invoices.create(invoicePayload) : db.invoices.create(invoicePayload));
 
     res.status(201).json({ success: true, invoice: newInvoice });
   } catch (err) {
@@ -280,7 +287,7 @@ router.post('/', authenticateToken, async (req, res) => {
 // PUT /api/invoices/:id
 router.put('/:id', authenticateToken, async (req, res) => {
   try {
-    const existing = await db.invoices.findById(req.params.id);
+    const existing = await (req.db ? req.db.invoices.findById(req.params.id) : db.invoices.findById(req.params.id, req.workspace_id));
     if (!existing) {
       return res.status(404).json({ success: false, message: 'Invoice not found' });
     }
@@ -301,8 +308,8 @@ router.put('/:id', authenticateToken, async (req, res) => {
       paymentDetails
     } = req.body;
 
-    const business = await db.business.getProfile();
-    const businessStateCode = business.stateCode || '27';
+    const business = await (req.db ? req.db.business.getProfile() : db.business.getProfile(req.workspace_id));
+    const businessStateCode = business?.stateCode || '27';
     const targetPos = placeOfSupplyStateCode || existing.placeOfSupplyStateCode;
 
     // Validate customer GSTIN
@@ -366,7 +373,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
       ...(paymentDetails && { paymentDetails })
     };
 
-    const updated = await db.invoices.update(req.params.id, updates);
+    const updated = await (req.db ? req.db.invoices.update(req.params.id, updates) : db.invoices.update(req.params.id, updates, req.workspace_id));
     res.json({ success: true, invoice: updated });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -376,7 +383,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
 // Record Payment & Update Status (supports both PATCH and POST)
 const handleRecordPayment = async (req, res) => {
   try {
-    const existing = await db.invoices.findById(req.params.id);
+    const existing = await (req.db ? req.db.invoices.findById(req.params.id) : db.invoices.findById(req.params.id, req.workspace_id));
     if (!existing) {
       return res.status(404).json({ success: false, message: 'Invoice not found' });
     }
@@ -392,7 +399,7 @@ const handleRecordPayment = async (req, res) => {
       newStatus = 'Partial';
     }
 
-    const updated = await db.invoices.update(req.params.id, {
+    const updated = await (req.db ? req.db.invoices.update(req.params.id, {
       status: newStatus,
       paymentDetails: {
         amountPaid: paid,
@@ -401,7 +408,16 @@ const handleRecordPayment = async (req, res) => {
         paymentReference: paymentReference || '',
         notes: notes || ''
       }
-    });
+    }) : db.invoices.update(req.params.id, {
+      status: newStatus,
+      paymentDetails: {
+        amountPaid: paid,
+        paymentDate: paymentDate || new Date().toISOString().split('T')[0],
+        paymentMethod: paymentMethod || 'Bank Transfer',
+        paymentReference: paymentReference || '',
+        notes: notes || ''
+      }
+    }, req.workspace_id));
 
     res.json({ success: true, invoice: updated });
   } catch (err) {
@@ -415,7 +431,7 @@ router.post('/:id/payment', authenticateToken, handleRecordPayment);
 // DELETE /api/invoices/:id
 router.delete('/:id', authenticateToken, async (req, res) => {
   try {
-    const deleted = await db.invoices.delete(req.params.id);
+    const deleted = await (req.db ? req.db.invoices.delete(req.params.id) : db.invoices.delete(req.params.id, req.workspace_id));
     if (!deleted) {
       return res.status(404).json({ success: false, message: 'Invoice not found' });
     }

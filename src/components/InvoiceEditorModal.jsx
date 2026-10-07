@@ -27,9 +27,10 @@ export default function InvoiceEditorModal({
 }) {
   const businessStateCode = business?.stateCode || '27';
 
+  const currentYear = new Date().getFullYear();
   const defaultInvNum = business?.invoicePrefix 
     ? `${business.invoicePrefix}${business.nextInvoiceNumber || 101}` 
-    : 'INV-2024-101';
+    : `INV-${currentYear}-101`;
   const [invoiceNumber, setInvoiceNumber] = useState(defaultInvNum);
   const [invoiceDate, setInvoiceDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [dueDate, setDueDate] = useState(() => 
@@ -58,7 +59,7 @@ export default function InvoiceEditorModal({
       hsnSac: '998314',
       qty: 1,
       unit: 'NOS',
-      unitPrice: 25000,
+      unitPrice: 0,
       discountPercent: 0,
       gstRate: 18
     }
@@ -413,7 +414,7 @@ export default function InvoiceEditorModal({
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="e.g. Priya Sundaram"
+                    placeholder="e.g. Rahul Sharma"
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
                     required

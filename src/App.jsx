@@ -129,6 +129,9 @@ export default function App() {
           // Persist workspace_id so Supabase queries are scoped correctly
           if (res.user.workspace_id) setWorkspaceId(res.user.workspace_id);
           await loadWorkspaceData();
+        } else {
+          setAuthToken('');
+          setCurrentUser(null);
         }
       } catch {
         setAuthToken('');
@@ -231,6 +234,11 @@ export default function App() {
     setAuthToken('');
     setWorkspaceId(null);
     setCurrentUser(null);
+    setBusiness(null);
+    setCustomers([]);
+    setCatalogItems([]);
+    setInvoices([]);
+    setDashboardData(null);
     showToast('Logged out of GST workspace.', 'info');
   };
 
@@ -562,7 +570,7 @@ export default function App() {
             <strong>BillGST Pro</strong> — Compliant Indian GST Tax Invoicing System (CBIC Format, HSN/SAC, CGST/SGST/IGST)
           </div>
           <div>
-            Workspace: <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{business?.legalName || 'Vani Studios Private Limited'}</span>
+            Workspace: <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{business?.legalName || business?.name || currentUser?.businessName || 'My GST Workspace'}</span>
           </div>
         </div>
       </footer>

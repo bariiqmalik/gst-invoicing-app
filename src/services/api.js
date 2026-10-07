@@ -9,6 +9,7 @@ export function setAuthToken(token) {
     localStorage.setItem('billgst_token', token);
   } else {
     localStorage.removeItem('billgst_token');
+    localStorage.removeItem('billgst_workspace_id');
   }
 }
 
@@ -70,6 +71,7 @@ export const api = {
   socialLogin: (payload) => request('/auth/social', { method: 'POST', body: JSON.stringify(payload) }),
   passkeyLogin: (payload = {}) => request('/auth/passkey', { method: 'POST', body: JSON.stringify(payload) }),
   getMe: () => request('/auth/me'),
+  getAuthStatus: () => request('/auth/status'),
 
   // Business Profile
   getBusiness: () => request('/business'),

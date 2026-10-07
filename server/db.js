@@ -36,6 +36,24 @@ export function sanitizeDocument(doc) {
   return obj;
 }
 
+// MongoDB operator match helper
+function matchesValue(itemVal, queryVal) {
+  if (queryVal === undefined || queryVal === null) return true;
+  if (typeof queryVal === 'object' && !Array.isArray(queryVal) && !(queryVal instanceof Date)) {
+    for (const [op, target] of Object.entries(queryVal)) {
+      if (op === '$gte' && !(itemVal >= target)) return false;
+      if (op === '$lte' && !(itemVal <= target)) return false;
+      if (op === '$gt' && !(itemVal > target)) return false;
+      if (op === '$lt' && !(itemVal < target)) return false;
+      if (op === '$ne' && (itemVal === target || String(itemVal) === String(target))) return false;
+      if (op === '$in' && Array.isArray(target) && !target.some(t => t === itemVal || String(t) === String(itemVal))) return false;
+      if (op === '$nin' && Array.isArray(target) && target.some(t => t === itemVal || String(t) === String(itemVal))) return false;
+    }
+    return true;
+  }
+  return itemVal === queryVal || String(itemVal) === String(queryVal);
+}
+
 // File-backed persistent fallback store
 class FileStore {
   constructor(collectionName) {
@@ -103,9 +121,7 @@ class FileStore {
     const items = this.read();
     return items.filter(item => {
       for (const [k, v] of Object.entries(query)) {
-        if (v === undefined || v === null) continue;
-        const itemVal = item[k];
-        if (itemVal !== v && String(itemVal) !== String(v)) {
+        if (!matchesValue(item[k], v)) {
           return false;
         }
       }
@@ -117,9 +133,7 @@ class FileStore {
     const items = this.read();
     const item = items.find(i => {
       for (const [k, v] of Object.entries(query)) {
-        if (v === undefined || v === null) continue;
-        const itemVal = i[k];
-        if (itemVal !== v && String(itemVal) !== String(v)) {
+        if (!matchesValue(i[k], v)) {
           return false;
         }
       }

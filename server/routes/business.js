@@ -8,7 +8,7 @@ const router = express.Router();
 // GET /api/business
 router.get('/', authenticateToken, async (req, res) => {
   try {
-    const profile = await db.business.getProfile();
+    const profile = await (req.db ? req.db.business.getProfile() : db.business.getProfile(req.workspace_id));
     res.json({ success: true, business: profile, states: GST_STATES });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -63,7 +63,7 @@ router.put('/', authenticateToken, async (req, res) => {
       }
     }
 
-    const updated = await db.business.updateProfile(updates);
+    const updated = await (req.db ? req.db.business.updateProfile(updates) : db.business.updateProfile(updates, req.workspace_id));
     res.json({ success: true, business: updated });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });

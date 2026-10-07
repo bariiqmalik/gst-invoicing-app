@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Package } from 'lucide-react';
 import { validateHsnSac, formatINR } from '../utils/gstFrontendUtils';
 
 export default function CatalogView({
@@ -135,92 +135,123 @@ export default function CatalogView({
         </div>
       </div>
 
-      {/* Grid of Catalog Cards (Generous padding & subtle drop-shadows) */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-        gap: '24px'
-      }}>
-        {filtered.map(item => (
-          <div key={item.id} className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <span style={{
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  padding: '3px 8px',
-                  borderRadius: '4px',
-                  background: item.type === 'SERVICES' ? 'var(--primary-subtle)' : 'var(--accent-subtle)',
-                  color: item.type === 'SERVICES' ? 'var(--primary)' : 'var(--accent-dark)',
-                  border: item.type === 'SERVICES' ? '1px solid var(--info-border)' : '1px solid var(--warning-border)'
-                }}>
-                  {item.type}
-                </span>
+      {/* Grid of Catalog Cards or Empty State */}
+      {filtered.length === 0 ? (
+        <div className="card" style={{ textAlign: 'center', padding: '64px 20px', color: 'var(--muted-text)' }}>
+          <Package size={48} color="var(--border)" style={{ marginBottom: '16px' }} />
+          <h3 style={{ color: 'var(--text)' }}>
+            {search ? `No products or services matching "${search}"` : 'Your item catalog is empty'}
+          </h3>
+          <p style={{ fontSize: '14px', marginTop: '6px', color: 'var(--muted-text)', maxWidth: '440px', margin: '6px auto 0' }}>
+            {search 
+              ? 'Try searching with different keywords or clear the search input.' 
+              : 'Add your goods and services with SAC / HSN codes for quick 1-click addition to GST invoices.'}
+          </p>
+          {search ? (
+            <button 
+              className="btn btn-outline btn-sm"
+              onClick={() => setSearch('')}
+              style={{ marginTop: '20px' }}
+            >
+              Clear Search
+            </button>
+          ) : (
+            <button 
+              className="btn btn-primary btn-sm"
+              onClick={openAddModal}
+              style={{ marginTop: '20px' }}
+            >
+              <Plus size={15} /> Add Product / Service
+            </button>
+          )}
+        </div>
+      ) : (
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+          gap: '24px'
+        }}>
+          {filtered.map(item => (
+            <div key={item.id} className="card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <span style={{
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    padding: '3px 8px',
+                    borderRadius: '4px',
+                    background: item.type === 'SERVICES' ? 'var(--primary-subtle)' : 'var(--accent-subtle)',
+                    color: item.type === 'SERVICES' ? 'var(--primary)' : 'var(--accent-dark)',
+                    border: item.type === 'SERVICES' ? '1px solid var(--info-border)' : '1px solid var(--warning-border)'
+                  }}>
+                    {item.type}
+                  </span>
 
-                <span style={{
-                  fontSize: '12px',
-                  fontWeight: 700,
-                  color: 'var(--text)',
-                  background: 'var(--bg-subtle)',
-                  padding: '3px 8px',
-                  borderRadius: '4px',
-                  border: '1px solid var(--border)'
-                }}>
-                  GST {item.defaultGstRate}%
-                </span>
+                  <span style={{
+                    fontSize: '12px',
+                    fontWeight: 700,
+                    color: 'var(--text)',
+                    background: 'var(--bg-subtle)',
+                    padding: '3px 8px',
+                    borderRadius: '4px',
+                    border: '1px solid var(--border)'
+                  }}>
+                    GST {item.defaultGstRate}%
+                  </span>
+                </div>
+
+                <h3 style={{ marginTop: '14px', color: 'var(--primary)' }}>
+                  {item.name}
+                </h3>
+
+                {item.description && (
+                  <p style={{ fontSize: '13px', color: 'var(--muted-text)', marginTop: '4px', lineHeight: 1.4 }}>
+                    {item.description}
+                  </p>
+                )}
+
+                <div style={{ marginTop: '16px', fontSize: '13px', color: 'var(--text)' }}>
+                  <div>
+                    <span style={{ color: 'var(--muted-text)' }}>{item.type === 'SERVICES' ? 'SAC Code:' : 'HSN Code:'} </span>
+                    <strong style={{ fontFamily: 'monospace', color: 'var(--primary)' }}>{item.hsnSacCode}</strong>
+                  </div>
+                  <div style={{ marginTop: '4px' }}>
+                    <span style={{ color: 'var(--muted-text)' }}>Default Rate: </span>
+                    <strong style={{ fontSize: '15px', color: 'var(--secondary)' }}>{formatINR(item.unitPrice)}</strong>
+                    <span style={{ fontSize: '11px', color: 'var(--muted-text)' }}> / {item.unit}</span>
+                  </div>
+                </div>
               </div>
 
-              <h3 style={{ marginTop: '14px', color: 'var(--primary)' }}>
-                {item.name}
-              </h3>
-
-              {item.description && (
-                <p style={{ fontSize: '13px', color: 'var(--muted-text)', marginTop: '4px', lineHeight: 1.4 }}>
-                  {item.description}
-                </p>
-              )}
-
-              <div style={{ marginTop: '16px', fontSize: '13px', color: 'var(--text)' }}>
-                <div>
-                  <span style={{ color: 'var(--muted-text)' }}>{item.type === 'SERVICES' ? 'SAC Code:' : 'HSN Code:'} </span>
-                  <strong style={{ fontFamily: 'monospace', color: 'var(--primary)' }}>{item.hsnSacCode}</strong>
-                </div>
-                <div style={{ marginTop: '4px' }}>
-                  <span style={{ color: 'var(--muted-text)' }}>Default Rate: </span>
-                  <strong style={{ fontSize: '15px', color: 'var(--secondary)' }}>{formatINR(item.unitPrice)}</strong>
-                  <span style={{ fontSize: '11px', color: 'var(--muted-text)' }}> / {item.unit}</span>
-                </div>
+              <div style={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                gap: '8px',
+                marginTop: '18px',
+                paddingTop: '14px',
+                borderTop: '1px solid var(--border)'
+              }}>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => openEditModal(item)}
+                  aria-label="Edit catalog item"
+                >
+                  <Edit2 size={14} />
+                  <span>Edit</span>
+                </button>
+                <button
+                  className="btn btn-ghost btn-sm"
+                  style={{ color: 'var(--danger)' }}
+                  onClick={() => onDeleteItem(item.id)}
+                  aria-label="Delete catalog item"
+                >
+                  <Trash2 size={14} />
+                </button>
               </div>
             </div>
-
-            <div style={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              gap: '8px',
-              marginTop: '18px',
-              paddingTop: '14px',
-              borderTop: '1px solid var(--border)'
-            }}>
-              <button
-                className="btn btn-ghost btn-sm"
-                onClick={() => openEditModal(item)}
-                aria-label="Edit catalog item"
-              >
-                <Edit2 size={14} />
-                <span>Edit</span>
-              </button>
-              <button
-                className="btn btn-ghost btn-sm"
-                style={{ color: 'var(--danger)' }}
-                onClick={() => onDeleteItem(item.id)}
-                aria-label="Delete catalog item"
-              >
-                <Trash2 size={14} />
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Add / Edit Catalog Modal */}
       {isModalOpen && (

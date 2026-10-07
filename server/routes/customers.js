@@ -8,7 +8,7 @@ const router = express.Router();
 // GET /api/customers
 router.get('/', authenticateToken, async (req, res) => {
   try {
-    const customers = await db.customers.find();
+    const customers = await (req.db ? req.db.customers.find() : db.customers.find({ workspace_id: req.workspace_id }));
     res.json({ success: true, customers });
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
@@ -18,7 +18,7 @@ router.get('/', authenticateToken, async (req, res) => {
 // GET /api/customers/:id
 router.get('/:id', authenticateToken, async (req, res) => {
   try {
-    const customer = await db.customers.findById(req.params.id);
+    const customer = await (req.db ? req.db.customers.findById(req.params.id) : db.customers.findById(req.params.id, req.workspace_id));
     if (!customer) {
       return res.status(404).json({ success: false, message: 'Customer not found' });
     }
@@ -48,7 +48,7 @@ router.post('/', authenticateToken, async (req, res) => {
       isB2B = true;
     }
 
-    const newCustomer = await db.customers.create({
+    const customerData = {
       name,
       companyName: companyName || '',
       gstin: gstin ? gstin.trim().toUpperCase() : '',
@@ -57,8 +57,11 @@ router.post('/', authenticateToken, async (req, res) => {
       phone: phone || '',
       billingAddress: billingAddress || {},
       shippingAddress: shippingAddress || {},
-      notes: notes || ''
-    });
+      notes: notes || '',
+      workspace_id: req.workspace_id
+    };
+
+    const newCustomer = await (req.db ? req.db.customers.create(customerData) : db.customers.create(customerData));
 
     res.status(201).json({ success: true, customer: newCustomer });
   } catch (err) {
@@ -83,7 +86,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
       updates.isB2B = false;
     }
 
-    const updated = await db.customers.update(req.params.id, updates);
+    const updated = await (req.db ? req.db.customers.update(req.params.id, updates) : db.customers.update(req.params.id, updates, req.workspace_id));
     if (!updated) {
       return res.status(404).json({ success: false, message: 'Customer not found' });
     }
@@ -96,7 +99,7 @@ router.put('/:id', authenticateToken, async (req, res) => {
 // DELETE /api/customers/:id
 router.delete('/:id', authenticateToken, async (req, res) => {
   try {
-    const deleted = await db.customers.delete(req.params.id);
+    const deleted = await (req.db ? req.db.customers.delete(req.params.id) : db.customers.delete(req.params.id, req.workspace_id));
     if (!deleted) {
       return res.status(404).json({ success: false, message: 'Customer not found' });
     }

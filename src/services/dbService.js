@@ -28,13 +28,18 @@ function isTableMissingOrSupabaseError(error) {
   if (!error) return false;
   const msg = String(error.message || '').toLowerCase();
   const code = String(error.code || '');
+  const status = Number(error.status || 0);
   return (
+    status >= 400 ||
     code === 'PGRST205' ||
     code === '42P01' ||
     msg.includes('schema cache') ||
     msg.includes('does not exist') ||
     msg.includes('relation') ||
-    msg.includes('failed to fetch')
+    msg.includes('failed to fetch') ||
+    msg.includes('network') ||
+    msg.includes('521') ||
+    msg.includes('cloudflare')
   );
 }
 

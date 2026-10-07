@@ -7,9 +7,9 @@ const router = express.Router();
 // GET /api/dashboard
 router.get('/', authenticateToken, async (req, res) => {
   try {
-    const invoices = await db.invoices.find();
-    const customerCount = await db.customers.count();
-    const catalogCount = await db.catalog.count();
+    const invoices = await (req.db ? req.db.invoices.find() : db.invoices.find({ workspace_id: req.workspace_id }));
+    const customerCount = await (req.db ? req.db.customers.count() : db.customers.count({ workspace_id: req.workspace_id }));
+    const catalogCount = await (req.db ? req.db.catalog.count() : db.catalog.count({ workspace_id: req.workspace_id }));
 
     let totalRevenue = 0;
     let totalOutstanding = 0;
