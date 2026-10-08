@@ -19,9 +19,11 @@ import {
   invoicesService,
   setWorkspaceId
 } from './services/dbService';
+import { supabase } from './lib/supabaseClient';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(null);
+  const [session, setSession] = useState(null);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [currentTab, setCurrentTab] = useState('dashboard');
 
@@ -114,34 +116,133 @@ export default function App() {
     await loadSupabaseData();
   }, [loadSupabaseData]);
 
-  // Check initial authentication
+  // Helper to extract clean user profile from a Supabase OAuth session
+  const extractUserFromSession = useCallback((activeSession) => {
+    if (!activeSession?.user) return null;
+    const sbUser = activeSession.user;
+    const name =
+      sbUser.user_metadata?.full_name ||
+      sbUser.user_metadata?.name ||
+      sbUser.user_metadata?.user_name ||
+      sbUser.email?.split('@')[0] ||
+      'GitHub User';
+    const businessName =
+      sbUser.user_metadata?.business_name ||
+      `${name}'s Workspace`;
+
+    return {
+      id: sbUser.id,
+      email: sbUser.email,
+      name,
+      businessName,
+      workspace_id: sbUser.id,
+      authProvider: sbUser.app_metadata?.provider || 'github',
+      avatar_url: sbUser.user_metadata?.avatar_url
+    };
+  }, []);
+
+  // Root auth handler: check existing session on mount & subscribe to onAuthStateChange
   useEffect(() => {
-    async function checkAuth() {
-      const token = getAuthToken();
-      if (!token) {
-        setIsAuthChecking(false);
-        return;
+    let isMounted = true;
+
+    const syncAndLoadUser = async (activeSession) => {
+      const authUser = extractUserFromSession(activeSession);
+      if (!authUser) return;
+
+      if (isMounted) {
+        setSession(activeSession);
+        setCurrentUser(authUser);
+        setWorkspaceId(authUser.workspace_id);
       }
+
+      // Sync user profile to backend Express REST layer for unified session
       try {
-        const res = await api.getMe();
-        if (res.success && res.user) {
-          setCurrentUser(res.user);
-          // Persist workspace_id so Supabase queries are scoped correctly
-          if (res.user.workspace_id) setWorkspaceId(res.user.workspace_id);
-          await loadWorkspaceData();
-        } else {
-          setAuthToken('');
-          setCurrentUser(null);
+        const syncRes = await api.socialLogin({
+          provider: authUser.authProvider,
+          email: authUser.email,
+          name: authUser.name,
+          businessName: authUser.businessName
+        });
+        if (syncRes.success && syncRes.token) {
+          setAuthToken(syncRes.token);
+          if (syncRes.user?.workspace_id) {
+            setWorkspaceId(syncRes.user.workspace_id);
+          }
         }
-      } catch {
-        setAuthToken('');
-        setCurrentUser(null);
-      } finally {
-        setIsAuthChecking(false);
+      } catch (err) {
+        console.info('[Auth] Backend sync notice:', err.message);
       }
-    }
-    checkAuth();
-  }, [loadWorkspaceData]);
+
+      await loadWorkspaceData();
+    };
+
+    // 1. Check for existing session on mount using supabase.auth.getSession()
+    const checkInitialAuth = async () => {
+      try {
+        const { data: { session: existingSession }, error } = await supabase.auth.getSession();
+        if (error) {
+          console.warn('[Supabase] getSession notice:', error.message);
+        }
+
+        if (existingSession?.user) {
+          await syncAndLoadUser(existingSession);
+          if (isMounted) setIsAuthChecking(false);
+          return;
+        }
+
+        // Fallback: Check local JWT token from Express API
+        const token = getAuthToken();
+        if (token) {
+          try {
+            const res = await api.getMe();
+            if (res.success && res.user && isMounted) {
+              setCurrentUser(res.user);
+              if (res.user.workspace_id) setWorkspaceId(res.user.workspace_id);
+              await loadWorkspaceData();
+            } else if (isMounted) {
+              setAuthToken('');
+              setCurrentUser(null);
+            }
+          } catch {
+            if (isMounted) {
+              setAuthToken('');
+              setCurrentUser(null);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('[Auth] Initial auth check failed:', err);
+      } finally {
+        if (isMounted) setIsAuthChecking(false);
+      }
+    };
+
+    checkInitialAuth();
+
+    // 2. Set up supabase.auth.onAuthStateChange to update user state automatically when returning from GitHub
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+      if (newSession?.user) {
+        await syncAndLoadUser(newSession);
+        if (isMounted) {
+          setIsAuthChecking(false);
+          showToast(`Welcome! Signed in via GitHub.`, 'success');
+        }
+      } else if (_event === 'SIGNED_OUT') {
+        if (isMounted) {
+          setSession(null);
+          setCurrentUser(null);
+          setAuthToken('');
+          setWorkspaceId(null);
+          setIsAuthChecking(false);
+        }
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      subscription?.unsubscribe();
+    };
+  }, [extractUserFromSession, loadWorkspaceData, showToast]);
 
   // Reload invoices whenever filters change
   useEffect(() => {
@@ -230,7 +331,13 @@ export default function App() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.warn('[Supabase] signOut notice:', err);
+    }
+    setSession(null);
     setAuthToken('');
     setWorkspaceId(null);
     setCurrentUser(null);
@@ -459,8 +566,38 @@ export default function App() {
     );
   };
 
-  // If user is not authenticated, show single-business owner login modal
-  if (!currentUser) {
+  // Do not display the login modal if an active session or user exists.
+  // During initial auth check, show clean loading state to avoid modal flicker.
+  if (isAuthChecking) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'var(--background)',
+        color: 'var(--text)'
+      }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
+          <div style={{
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            border: '3px solid var(--border)',
+            borderTopColor: 'var(--palette-green)',
+            animation: 'billgst-spin 0.75s linear infinite'
+          }} />
+          <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--muted-text)' }}>
+            Verifying workspace access...
+          </span>
+          <style>{`@keyframes billgst-spin { to { transform: rotate(360deg); } }`}</style>
+        </div>
+      </div>
+    );
+  }
+
+  // If user is not authenticated and no active session, show login modal
+  if (!currentUser && !session) {
     return (
       <>
         <LoginModal 
